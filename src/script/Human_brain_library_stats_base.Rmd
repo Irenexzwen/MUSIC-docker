@@ -1,0 +1,306 @@
+---
+title: "sciMARGI library summary"
+date: "`r Sys.Date()`"
+output:
+  word_document:
+    reference_docx: "/snakemake/script//word-template.docx"
+  html_document: default
+  pdf_document: default
+csl: "/snakemake/script/molecular-cell.csl"
+params:
+  DIRPATH: null
+---
+
+```{r knitr_settings, eval=TRUE, echo=FALSE, cache=FALSE, warning=FALSE, message=FALSE}
+# this code chunk is for load utils library and global settings
+require(GenomicRanges)
+require(tidyverse)
+require(tibble)
+require(data.table)
+require(magrittr)
+`%ni%` = Negate(`%in%`)
+knitr::opts_chunk$set("tidy"=TRUE, "echo"=FALSE, "eval"=TRUE, "warning"=FALSE,  "message"=FALSE)
+inline_hook <- function(x){
+  if(is.list(x)){ x <- unlist(x) }
+  if(is.numeric(x)){
+    if( abs( x-round(x)) < .Machine$double.eps^0.5){
+      paste(format(x, big.mark=",", digits=0, scientific=FALSE))
+    } else {
+      paste(format(x, big.mark=",", digits=2, nsmall=2, scientific=FALSE))
+    } 
+  } else {
+      paste(x)
+  }
+}
+knitr::knit_hooks$set(inline = inline_hook)
+```
+
+## Data processing pipeline:
+1. Customized code to:
+  + Resolve complex barcode by matching 10x barcode to whitelist (3.5Million, perfect match required), split 10x barcode and UMI.
+  + Resolve three cell barcodes (each allow 2 mismatch).
+  + Separate RNA and DNA based on adaptor sequence (adaptor sequence 2 mismatch allowed).
+  + Export splitted library into barcode resolved fastq files for DNA and RNA end individually, with barcode information added to the read name header. 
+2. Trim DNA sequences if they contain long stretch of polyA or polyG. Here we choose at least 20A or G. Only trimmed reads longer than 20bp will be proceed to next step.
+3. Map DNA end to human and mouse genome separately using bowtie2. Selected unique mapped reads only for downstream analysis.
+4. Map RNA endsto both human and mouse transcriptome. 
+5. Using customized code to dedup mapped reads (DNA and RNA) based on UMI, library index and genomic locations. 
+6. Combine all samples together into a whole library for both RNA ends and DNA ends.
+7. Generate statistics including number of reads per cell, number of clusters per cell, number of reads per clusters etc for DNA and RNA reads separately. 
+
+
+## Library statistics:
+
+### 1. Resolve barcode:
+
+```{r barcode, eval=TRUE, echo=FALSE, cache=FALSE, warning=FALSE, message=FALSE}
+MASTER_OUTDIR = paste0(params$DIRPATH, "/outputs/")
+samples = list.files(paste0(MASTER_OUTDIR,"4_dedup/"))
+
+get_barcode_stats <- function(sample){
+  # each sample return total raw reads, incorrect 10x, incorrect BC, final reads
+  
+  log_file = paste0(MASTER_OUTDIR, "1_decode/", sample, "_stats.log")
+  
+  con <- file(log_file,"r")
+  
+  total_reads <- readLines(con, n=4)[4] %>% str_split(.,": ") %>% unlist %>% .[2] %>% as.numeric()
+  
+  incorrect_10x <- readLines(con, n=1)[1] %>% str_split(.," :") %>% unlist %>% .[2] %>% as.numeric()
+  
+  incomplete_CB <- readLines(con, n=1)[1] %>% str_split(.," :") %>% unlist %>% .[2] %>% as.numeric()
+  
+  final_DNA_reads <- readLines(con, n=1)[1] %>% str_split(.," :") %>% unlist %>% .[2] %>% as.numeric()
+  
+  final_RNA_reads <- readLines(con, n=1)[1] %>% str_split(.," :") %>% unlist %>% .[2] %>% as.numeric()
+    
+  close(con)
+  
+  sum_df <- data.frame(sample=sample,
+                       Raw_reads = total_reads,
+                       inperfect_10x = incorrect_10x,
+                       incomplete_CB = incomplete_CB,
+                       final_DNA_reads = final_DNA_reads,
+                       final_RNA_reads = final_RNA_reads)
+  return(sum_df)
+}
+
+barcode_summary <- lapply(samples, get_barcode_stats) %>% do.call(rbind,. ) %>% 
+  rbind(., c("Total", sum(.$Raw_reads), sum(.$inperfect_10x),
+             sum(.$incomplete_CB), sum(.$final_DNA_reads), sum(.$final_RNA_reads))) %>% 
+  mutate_at(vars(-sample), as.numeric) %>% 
+    mutate(DNA_final_ratio=final_DNA_reads/Raw_reads,
+           RNA_final_ratio=final_RNA_reads/Raw_reads) %>% 
+    mutate(DNA_final_ratio = scales::percent(DNA_final_ratio, accuracy = 0.01),
+           RNA_final_ratio = scales::percent(RNA_final_ratio, accuracy = 0.01))
+
+```
+```{r barcode_tbl, eval=TRUE, echo=FALSE, cache=FALSE, warning=FALSE, message=FALSE}
+require(knitr)
+require(kableExtra)
+require(flextable)
+barcode_summary %>%
+    regulartable() %>% 
+    autofit() %>% fit_to_width(7.5) %>% flextable::fontsize(size = 7, part = "all") %>% 
+    set_caption(caption = " ", 
+                  style = "Table Caption")
+```      
+
+
+### 2. DNA mapping summary
+
+```{r DNA_mapping, eval=TRUE, echo=FALSE, cache=FALSE, warning=FALSE, message=FALSE}
+
+get_mapping_stats <- function(sample){
+  
+  human_states_file <- paste0(MASTER_OUTDIR, "2_DNAmapping/bowtie2_mapq20_", sample, ".stats.txt")
+
+  con1 <- file(human_states_file,"r")
+  
+  input_dna <- readLines(con1, n=5)[5] %>% str_split(.," ") %>% unlist %>% .[1]
+  
+  human_unique <- readLines(con1, n=3)[3] %>% str_split(.," aligned") %>% unlist %>% .[1] %>% gsub(".   ","",.)
+  
+  human_multi <- readLines(con1, n=1)[1] %>% str_split(.," aligned") %>% unlist %>% .[1] %>% gsub(".   ","",.)
+  
+  close(con1)
+  
+  res <- data.frame(sample=sample, input_DNA=input_dna,
+                    map2human_uniq = human_unique, map2human_multi = human_multi) 
+  return(res)
+}
+
+DNA_mapping_summary <- lapply(samples, get_mapping_stats) %>% do.call(rbind,. )
+
+# add summary of eight libraries
+DNA_mapping_summary %<>% rowwise %>% 
+  mutate(map2human_uniq_reads = str_split(map2human_uniq, " ") %>% unlist %>% .[[1]] %>% as.integer()) %>% 
+  mutate(map2human_multi_reads = str_split(map2human_multi, " ") %>% unlist %>% .[[1]] %>% as.integer()) %>% 
+  mutate(input_DNA = as.numeric(input_DNA)) %>% 
+  dplyr::select(sample, input_DNA, map2human_uniq_reads, map2human_multi_reads) %>% 
+  janitor::adorn_totals("row") 
+
+```
+
+```{r DNA_mapping_tbl, eval=TRUE, echo=FALSE, cache=FALSE, warning=FALSE, message=FALSE}
+DNA_mapping_summary2 <- DNA_mapping_summary %>% 
+  mutate(map2human_uniq_reads = paste0(map2human_uniq_reads, " (", scales::percent(map2human_uniq_reads/input_DNA, accuracy = 0.01), ")")) %>% 
+  mutate(map2human_multi_reads = paste0(map2human_multi_reads, " (", scales::percent(map2human_multi_reads/input_DNA, accuracy = 0.01), ")")) 
+
+dna_tbl <- DNA_mapping_summary2 %>% regulartable() %>% 
+    autofit() %>% fit_to_width(7.5) %>% flextable::fontsize(size = 7, part = "all") %>% 
+    set_caption(caption = " ", 
+                  style = "Table Caption")
+
+dna_tbl <- flextable::footnote( dna_tbl,
+                                i = 1, j = 2,
+               value = as_paragraph(
+                c("Input_DNA are subset of final_DNA_reads that do not contain subsequent plotA(20) or polyG(20) and after trim length is larger than 20bp.")
+               ),
+               ref_symbols = c("a"),
+               part = "header", inline = TRUE)
+dna_tbl
+```   
+
+
+### 3. RNA mapping summary
+
+```{r RNAmapping, eval=TRUE, echo=FALSE, cache=FALSE, warning=FALSE, message=FALSE}
+
+get_STAR_stats <- function(sample){
+  
+  STAR_human <- paste0(MASTER_OUTDIR, "3_RNAmapping/",sample,"/",sample,"_Log.final.out")
+  
+  con3 <- file(STAR_human,"r")
+  Input_RNA <- readLines(con3, n=6)[6] %>% str_split(., "\t") %>% unlist %>% .[2]
+  human_unique_num <- readLines(con3, n=3)[3] %>% str_split(.,"\t") %>% unlist %>% .[2]
+  human_unique_map_ratio <- readLines(con3, n=1)[1] %>% str_split(.,"\t") %>% unlist %>% .[2]
+  human_multi_num <- readLines(con3, n=14)[14] %>% str_split(.,"\t") %>% unlist %>% .[2]
+  human_multi_map_ratio <- readLines(con3, n=1)[1] %>% str_split(.,"\t") %>% unlist %>% .[2]
+  close(con3)
+  
+  RNA_res <- data.frame(sample=sample, Input_RNA = Input_RNA,
+             h_uniq=human_unique_num, 
+             h_multi=human_multi_num) 
+  return(RNA_res)
+  
+}
+
+RNA_mapping_summary <- lapply(samples, get_STAR_stats) %>% do.call(rbind,. ) %>%  
+    dplyr::mutate_at(vars(contains("_")), .funs = (as.numeric)) %>% 
+    janitor::adorn_totals("row") %>% 
+    mutate(RNA_map2human_unique = paste0(h_uniq, " (", scales::percent(h_uniq/Input_RNA, accuracy = 0.01), ")"),
+           RNA_map2human_multi = paste0(h_multi, " (", scales::percent(h_multi/Input_RNA, accuracy = 0.01), ")")) %>%
+   dplyr::select(sample, Input_RNA, RNA_map2human_unique, RNA_map2human_multi)
+
+```
+
+```{r RNA_mapping_tbl, eval=TRUE, echo=FALSE, cache=FALSE, warning=FALSE, message=FALSE}
+RNA_mapping_summary %>%
+    regulartable() %>% 
+    autofit() %>% fit_to_width(7.5) %>% flextable::fontsize(size = 7, part = "all") %>% 
+    set_caption(caption = " ", 
+                  style = "Table Caption")
+``` 
+
+### 4. Deduplication results
+
+```{r dedup, eval=TRUE, echo=FALSE, cache=FALSE, warning=FALSE, message=FALSE}
+
+get_dedup_stats <- function(sample){
+  
+  dedup_lib = paste0(MASTER_OUTDIR, "4_dedup/",sample,"/")
+  dna_mapq20 = paste0(MASTER_OUTDIR, "2_DNAmapping/")
+    
+  dna_mapq20 <- system(paste0("samtools view ", dna_mapq20, "bowtie2_mapq20_",sample,".sorted.bam | wc -l"), intern = TRUE)
+  
+  dedup_human_dna <- system(paste0("samtools view ", dedup_lib, "bowtie2_mapq20_",sample,".sorted.dedup.bam | wc -l"), intern = TRUE)
+  
+  dedup_human_rna <- system(paste0("samtools view ", dedup_lib, "RNA_STAR_mapq255_",sample,".sorted.dedup.bam | wc -l"), intern = TRUE)
+  
+  res <- data.frame(sample=sample,
+             primary_DNA_mapping_mapq20 = dna_mapq20,
+             dedup_human_mapq20_DNA = dedup_human_dna,
+             dedup_human_RNA = dedup_human_rna)
+  
+}
+
+dedupped_res <- lapply(samples, get_dedup_stats) %>% do.call(rbind,. )
+
+dedup_summary <- 
+  RNA_mapping_summary %>% dplyr::select(sample, RNA_map2human_unique) %>% 
+  dplyr::rename(human_uniq_RNA = RNA_map2human_unique) %>% 
+  mutate(human_uniq_RNA = gsub("\\(.*\\)","",human_uniq_RNA)) %>% 
+  left_join(dedupped_res) %>% 
+  dplyr::filter(sample != "Total") %>% 
+  mutate_at(vars(contains("_")), .funs = as.numeric) %>% 
+  janitor::adorn_totals("row") %>% 
+  mutate(dedup_human_mapq20_DNA = paste0(dedup_human_mapq20_DNA, " (", scales::percent(dedup_human_mapq20_DNA/primary_DNA_mapping_mapq20, accuracy = 0.01),")"),
+         h_dedupped_RNA = paste0(dedup_human_RNA, " (", scales::percent(dedup_human_RNA/human_uniq_RNA, accuracy = 0.01),")")) %>% 
+  dplyr::select(sample, primary_DNA_mapping_mapq20, dedup_human_mapq20_DNA, human_uniq_RNA, h_dedupped_RNA)
+
+```
+
+
+```{r dedup_tbl, eval=TRUE, echo=FALSE, cache=FALSE, warning=FALSE, message=FALSE}
+dedup_summary %>%
+    regulartable() %>% 
+    autofit() %>% fit_to_width(7.5) %>% flextable::fontsize(size = 7, part = "all") %>% 
+    set_caption(caption = " ", 
+                  style = "Table Caption")
+``` 
+
+
+### 5. Combined whole library statistics:
+
+```{r combine_all_stats_one_col, eval=TRUE, echo=FALSE, cache=FALSE, warning=FALSE, message=FALSE}
+
+final_tbl <- rbind(barcode_summary %>% filter(sample=="Total") %>% t(),
+      DNA_mapping_summary2 %>% filter(sample=="Total") %>% t(),
+      RNA_mapping_summary %>% filter(sample=="Total") %>% t(),
+      dedup_summary %>% filter(sample=="Total") %>% t()) %>% as.data.frame() %>% 
+  rownames_to_column() %>% set_colnames(c("names", "values")) %>% 
+  dplyr::filter(values !="Total") %>% 
+  dplyr::filter(names %ni% c("final_DNA_reads", "final_RNA_reads", "DNA_final_ratio", "RNA_final_ratio")) %>% 
+  dplyr::filter(!grepl("_uniq_DNA|_uniq_RNA", names)) %>% 
+  dplyr::filter(names != "primary_DNA_mapping_mapq20")
+  
+final_tbl[4,2] <- paste0(final_tbl[4,2], " (",
+                         scales::percent(as.numeric(final_tbl[4,2])/as.numeric(final_tbl[1,2]), accuracy = 0.01), ")")
+
+final_tbl[7,2] <- paste0(final_tbl[7,2], " (",
+                         scales::percent(as.numeric(final_tbl[7,2])/as.numeric(final_tbl[1,2]), accuracy = 0.01), ")")
+
+final_tbl[10,1] <- "dedup_human_DNA"
+final_tbl[11,1] <- "dedup_human_RNA"
+
+final_tbl %>% regulartable() %>% 
+autofit() %>% fit_to_width(5) %>% flextable::fontsize(size = 7, part = "all") %>% 
+set_caption(caption = " ", 
+              style = "Table Caption")
+
+```
+
+Table legend:
+*Raw_reads*: Total raw reads produced by sequencer. 
+
+*Inperfect_10x*: Number of reads that do not perfectly match any of the reference 10x barcodes.
+
+*Incomplete_CB*: Number of reads that do not have all three cell barcodes match to reference list within at most 2 mismatches. 
+
+*Input_DNA*: Number of reads that have correct 10x and all three cell barcodes and DNA specific linker sequence within 2 mismatches from reference. The ratio appended is Input_DNA/Raw_reads.
+
+*dna_map2human_uniq*: Number of Input_DNA reads that are uniquely mapped to the human genome. The appended ratio is dna_map2human_uniq/Input_DNA. 
+
+*dna_map2human_multi*: Number of Input_DNA reads that are non-uniquely mapped to the human genome. The appended ratio is dna_map2human_uniq/Input_DNA.
+
+*Input_RNA*: Number of reads that have correct 10x and all three cell barcodes and RNA specific linker sequence within 2 mismatches from reference. The ratio appended is Input_RNA/Raw_reads.
+
+*rna_map2human_uniq*: Number of Input_RNA reads that are uniquely mapped to the human genome. The appended ratio is rna_map2human_uniq/Input_DNA. 
+
+*rna_map2human_multi*: Number of Input_RNA reads that are non-uniquely mapped to the human genome. The appended ratio is rna_map2human_multi/Input_DNA.
+
+*h_dedupped_uniq_DNA*: Number of uniquely mapped DNA reads after deduplication. 
+
+*h_dedupped_uniq_RNA*: Number of uniquely mapped RNA reads after deduplication. 
+
