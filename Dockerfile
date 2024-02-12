@@ -15,7 +15,7 @@ RUN conda config --add channels conda-forge \
 
 RUN mamba install -y python=3.8 pandas openpyxl numpy gzip \
     pybktree h5py time psutil biopython Levenshtein pathlib pysam \
-    samtools snakemake bowtie2 bwa cutadapt fastp pandoc
+    samtools snakemake bowtie2 bwa cutadapt fastp pandoc sambamba
 
 RUN mamba install -c r r-base r-stringi r-stringr r-systemfonts r-tidyverse r-data.table r-magrittr r-seqinr r-gdtools r-flextable r-knitr r-kableextra r-janitor r-markdown bioconductor-genomicranges
 

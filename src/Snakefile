@@ -20,7 +20,10 @@ rule all:
         expand("{dir}{sample}/bowtie2_mapq20_{sample}.sorted.dedup.bam", dir=config["dir_names"]["dedup_dir"],sample=SAMPLES),
         expand("{dir}{sample}/BWA_uniq_map_{sample}.bam.bai", dir=config["dir_names"]["mapped_RNA_dir"], sample=SAMPLES),
         expand("{dir}{sample}/RNA_BWA_uniq_map_{sample}.sorted.dedup.bam", dir=config["dir_names"]["dedup_dir"], sample=SAMPLES),
-        expand("{dir}merge_DNA.sort.bam", dir=config["dir_names"]["merge_dir"], sample=SAMPLES)
+        expand("{dir}merge_DNA.sort.bam", dir=config["dir_names"]["merge_dir"], sample=SAMPLES),
+        expand("{dir}merge_RNA.sort.bam", dir=config["dir_names"]["merge_dir"], sample=SAMPLES),
+        expand("{dir}merge_{type1}.sort.{type2}.csv", dir=config["dir_names"]["stats_dir"], type1=['DNA','RNA'], type2=['cell_reads','cell_clusters','clusters_size']),
+        expand("{dir}merge.sort.cluster_rna_dna.csv", dir=config["dir_names"]["stats_dir"])
 
 
 rule decode:
@@ -105,17 +108,24 @@ rule Build_bwa_index:
     input:
         fasta_file=config["fasta"],
         gtf_file=config["gtf"]
+    params:
+        basename_bwa=config["dir_names"]["RNA_index_dir"]+"bwa_index"
     output:
-        index_dir=config["dir_names"]["RNA_index_dir"]+"bwa_index"
+        index_done_bwa=config["dir_names"]["RNA_index_dir"]+"_bwa_index_done.txt"
     threads: 10 
     shell:
-        "bwa index {input.fasta_file} -p {output.index_dir}"
+        """
+        bwa index {input.fasta_file} -p {params.basename_bwa}
+        echo "bwa index done" > {output.index_done_bwa}
+        """
         
         
 rule BWA_mapping_RNA:
     input:
         non_rRNA_fq = rules.trimRNA.output.trimed_RNA,
-        index_dir = rules.Build_bwa_index.output.index_dir
+        index_done_bwa = rules.Build_bwa_index.output.index_done_bwa
+    params:
+        index_prefix = config["dir_names"]["RNA_index_dir"]+"bwa_index"
     output:
         BWA_human_bam = config["dir_names"]["mapped_RNA_dir"] + "{sample}/BWA_uniq_map_{sample}.bam",
         BWA_human_bam_index = config["dir_names"]["mapped_RNA_dir"] + "{sample}/BWA_uniq_map_{sample}.bam.bai",
@@ -124,7 +134,7 @@ rule BWA_mapping_RNA:
     shell:
         """
         # map to human
-		bwa mem -t {threads} -SP5M {human_bwa} {input.non_rRNA_fq} | {sambamba} view -S -t {threads} -h -f bam -F "mapping_quality >= 1 and not (unmapped or secondary_alignment) and not ([XA] != null or [SA] != null)" /dev/stdin | {sambamba} sort -o {output.BWA_human_bam} /dev/stdin
+		bwa mem -t {threads} -SP5M {params.index_prefix} {input.non_rRNA_fq} | sambamba view -S -t {threads} -h -f bam -F "mapping_quality >= 1 and not (unmapped or secondary_alignment) and not ([XA] != null or [SA] != null)" /dev/stdin | sambamba sort -o {output.BWA_human_bam} /dev/stdin
 
 		samtools index {output.BWA_human_bam}
         """
@@ -155,5 +165,32 @@ rule combine_bam:
 
         """
 
+rule CB_reads_clu_stats:
+    input:
+        all_human_dna_bam = rules.combine_bam.output.combine_human_dna,
+        all_human_rna_bam = rules.combine_bam.output.combine_human_rna
+    output:
+        expand("{dir}merge_{type1}.sort.{type2}.csv", dir=config["dir_names"]["stats_dir"], type1=['DNA','RNA'], type2=['cell_reads','cell_clusters','clusters_size']),
+        cell_stats_done = config['dir_names']['stats_dir']+"cell_stats_done.txt"
+    threads: 4
+    params:
+        dir_=config['dir_names']['stats_dir']
+    shell:
+        """
+        python3 script/3____cell_reads_cluster_num_stats.py -inbam {input.all_human_dna_bam} -outdir {params.dir_}
+        python3 script/3____cell_reads_cluster_num_stats.py -inbam {input.all_human_rna_bam} -outdir {params.dir_}
+        """
+
+rule eachclusterdnarna:
+    input:
+        rules.CB_reads_clu_stats.output
+    output:
+        expand("{dir}merge_{species}.sort.cluster_rna_dna.csv", dir=config["dir_names"]["stats_dir"], species=['human'])
+    params:
+        dir_=config["dir_names"]["stats_dir"]
+    shell:
+        """
+        Rscript script/4____cluster_DNA_RNA_reads_ct.R {params.dir_}
+        """
 
 

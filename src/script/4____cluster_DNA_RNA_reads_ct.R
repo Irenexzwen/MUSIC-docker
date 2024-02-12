@@ -3,10 +3,7 @@
 require(tidyverse)
 require(data.table)
 require(magrittr)
-require(stringi)
-require(seqinr)
 require(tidyr)
-require(ggpubr)
 options(stringsAsFactors = FALSE)
 
 args <- commandArgs(TRUE)
