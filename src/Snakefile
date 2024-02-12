@@ -185,7 +185,7 @@ rule eachclusterdnarna:
     input:
         rules.CB_reads_clu_stats.output
     output:
-        expand("{dir}merge_{species}.sort.cluster_rna_dna.csv", dir=config["dir_names"]["stats_dir"], species=['human'])
+        expand("{dir}merge.sort.cluster_rna_dna.csv", dir=config["dir_names"]["stats_dir"])
     params:
         dir_=config["dir_names"]["stats_dir"]
     shell:
