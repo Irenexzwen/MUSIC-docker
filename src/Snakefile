@@ -179,11 +179,12 @@ rule CB_reads_clu_stats:
         """
         python3 script/3____cell_reads_cluster_num_stats.py -inbam {input.all_human_dna_bam} -outdir {params.dir_}
         python3 script/3____cell_reads_cluster_num_stats.py -inbam {input.all_human_rna_bam} -outdir {params.dir_}
+        echo "cell_stats_done" > {output.cell_stats_done}
         """
 
 rule eachclusterdnarna:
     input:
-        rules.CB_reads_clu_stats.output
+        rules.CB_reads_clu_stats.output.cell_stats_done
     output:
         expand("{dir}merge.sort.cluster_rna_dna.csv", dir=config["dir_names"]["stats_dir"])
     params:
