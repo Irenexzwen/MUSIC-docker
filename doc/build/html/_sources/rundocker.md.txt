@@ -1,19 +1,17 @@
-# Run sciMARGI-tool pipeline in Docker
+# Run MUSIC-tool pipeline in Docker
 
 ## Overview
 
-sciMARGI-docker is a tool designed to provide a one-stop solution for processing sciMARGI data. It is a docker image that wraps a Snakemake pipeline. sciMARGI-docker combines the power of Docker and Snakemake to provide a one-stop solution for processing sciMARGI data. It allows you to easily deploy and run the sciMARGI pipeline in a reproducible and efficient way, making it easier to manage and automate the data processing process.
+MUSIC-docker is a tool designed to provide a one-stop solution for processing MUSIC data. It is a docker image that wraps a Snakemake pipeline. MUSIC-docker combines the power of Docker and Snakemake to provide a one-stop solution for processing MUSIC data. It allows you to easily deploy and run the MUSIC pipeline in a reproducible and efficient way, making it easier to manage and automate the data processing process.
 
-<figure><img src="../.gitbook/assets/sciMARGI_pipeline.png" alt=""><figcaption><p>sciMARGI-docker overview</p></figcaption></figure>
+<figure><img src="_images/docker_pipeline.png" alt=""><figcaption><p>MUSIC-docker overview</p></figcaption></figure>
 
-.. note::
 **Why we choose docker?**
 
 Docker is a tool for packaging and deploying applications in lightweight containers. It allows you to package an application and its dependencies in a single container, making it easy to deploy and run on any platform. The philosophy behind Docker is to make it easier to create, deploy, and run applications by packaging them in containers. You can find more information about Docker and how to use it in the official Docker documentation at [https://docs.docker.com/](https://docs.docker.com/).
 
 
-.. note::
-Why we choose Snakemake?
+**Why we choose Snakemake?**
 
 Snakemake is a workflow management system that allows you to define and run complex pipelines in a reproducible and efficient way. It is designed to be scalable, flexible, and easy to use, with a simple yet powerful syntax for defining workflows. The philosophy behind Snakemake is to provide a simple and intuitive way to define and run complex pipelines, making it easier to manage and automate complex workflow processes. You can find more information about Snakemake and how to use it in the official Snakemake documentation at [https://snakemake.readthedocs.io/](https://snakemake.readthedocs.io/).
 
@@ -24,21 +22,21 @@ If you don't have docker installed, please follow the instructions from docker d
 
 
 
-## Install sciMARGI-tool image
+## Install MUSIC-tool image
 
-sciMARGI-tool has now been uploaded to docker cloud, which means you can install the container  by `docker pull` command:
+MUSIC-tool has now been uploaded to docker cloud, which means you can install the container  by `docker pull` command:
 
 ```
-docker pull zhonglab/scimargi
+docker pull irenexzwen/music_docker
 ```
 
 
 
-## Run sciMARGI-docker
+## Run MUSIC-docker
 
 ### Data preparation
 
-To run sciMARGI-tool locally, we first need to prepare the following input files in a structured directory. The docker image (created from sciMARGI-tool container) will run in an independent virtual enviornment. The only way for the image to communicate with your local file is through the `mount` command. Softwares running inside the docker image will recognize input files with the path inside the docker enviornment but not the file path on your local machine. So it is cruial to keep your input files in a structured directory and pass down parameters using relative path.&#x20;
+To run MUSIC-tool locally, we first need to prepare the following input files in a structured directory. The docker image (created from MUSIC-tool container) will run in an independent virtual enviornment. The only way for the image to communicate with your local file is through the `mount` command. Softwares running inside the docker image will recognize input files with the path inside the docker enviornment but not the file path on your local machine. So it is cruial to keep your input files in a structured directory and pass down parameters using relative path.
 
 **Required input files:**
 
@@ -52,7 +50,7 @@ To run sciMARGI-tool locally, we first need to prepare the following input files
 On your local machine prepare a input folder structured as follows:
 
 ```
-> tree local_path/sciMARGI_input_folder/
+> tree local_path/MUSIC_input_folder/
 
 ├── data
 │   ├── lib1_S1_R1_001.fastq.gz
@@ -79,7 +77,7 @@ On your local machine prepare a input folder structured as follows:
 ```
 
 {% hint style="warning" %}
-Notice that the output folder is necessary (even though it is empty right now), and it is the folder where your final output files will be located.&#x20;
+Notice that the output folder is necessary (even though it is empty right now), and it is the folder where your final output files will be located.
 {% endhint %}
 
 The samples.json file in our example will look like
@@ -130,23 +128,23 @@ The samples.json file in our example will look like
 }
 ```
 
-These are all required input files for sciMARGI-tool to run!&#x20;
+These are all required input files for MUSIC-tool to run!
 
 
 
-### Initiate the sciMARGI-tool image
+### Initiate the MUSIC-tool image
 
-After all input files are ready, we are ready to initiate the pipelline with `docker run` command.&#x20;
+After all input files are ready, we are ready to initiate the pipelline with `docker run` command.
 
 ```
-# download sciMARGI-tool docker image:
-docker pull zhonglab/scimargi:latest
+# download MUSIC-tool docker image:
+docker pull zhonglab/MUSIC:latest
 
 # run the pipeline
 docker run --rm \
-        -v /local_path/sciMARGI_input_folder/:/input \
-        -v /local_path/sciMARGI_input_folder/output/:/snakemake/outputs \
-        scimargi:latest \
+        -v /local_path/MUSIC_input_folder/:/input \
+        -v /local_path/MUSIC_input_folder/output/:/snakemake/outputs \
+        MUSIC:latest \
         --sample-json /input/data/samples.json \
         --num-jobs 20 \
         --name mysample \
@@ -159,13 +157,13 @@ docker run --rm \
 _Parameters explaination:_
 
 * `--rm` : By default, when a container exits, it is not removed and can still be inspected and restarted using the `docker start` command. However, if the `--rm` flag is specified, the container will be automatically removed once it exits. This can be useful for cleaning up after a one-time task, as it ensures that the system does not accumulate stopped containers that are no longer needed.
-* `-v`:  The `-v` flag is used with the `docker run` command to bind-mount a volume from the host system into a container. This allows you to share data between the host system and the container, or to persist data that is generated within the container beyond the lifetime of the container. the host path and the container path separated by a colon (`:`). In our command, we mount twice, the first one is `-v /local_path/sciMARGI_input_folder/:/input` which mount the local input folder to folder `/input` in docker image. As you could see, later when we specify other parameters such as `-fa, -gtf` , we will use the new path that is in docker image as "/input/ref/\*\*.fa".  The second one is `-v /local_path/sciMARGI_input_folder/out/:/snakemake/outputs` which is used to map docker produced output back to our local folder.&#x20;
-* `scimargi:latest`: Before adding other customized parameters, we need to specify the image name, which is usually `name:tag`
-* `--sample-json`: Location of the samples.json file inside the docker, not local file path. No need to change the default if you structured your input folder as we suggested.&#x20;
-* `--num-jobs`: Threads for running the job. Snakemake will automatically distribute cpus to all jobs in a very efficient manner.&#x20;
-* `--fa`: Location of the reference genome fasta file inside the docker, not local file path. No need to change the default if you structured your input folder as we suggested.&#x20;
+* `-v`:  The `-v` flag is used with the `docker run` command to bind-mount a volume from the host system into a container. This allows you to share data between the host system and the container, or to persist data that is generated within the container beyond the lifetime of the container. the host path and the container path separated by a colon (`:`). In our command, we mount twice, the first one is `-v /local_path/MUSIC_input_folder/:/input` which mount the local input folder to folder `/input` in docker image. As you could see, later when we specify other parameters such as `-fa, -gtf` , we will use the new path that is in docker image as "/input/ref/\*\*.fa".  The second one is `-v /local_path/MUSIC_input_folder/out/:/snakemake/outputs` which is used to map docker produced output back to our local folder.
+* `MUSIC:latest`: Before adding other customized parameters, we need to specify the image name, which is usually `name:tag`
+* `--sample-json`: Location of the samples.json file inside the docker, not local file path. No need to change the default if you structured your input folder as we suggested.
+* `--num-jobs`: Threads for running the job. Snakemake will automatically distribute cpus to all jobs in a very efficient manner.
+* `--fa`: Location of the reference genome fasta file inside the docker, not local file path. No need to change the default if you structured your input folder as we suggested.
 * `--gtf`: Similar to `--fa`, but for location of the reference genome gtf file.
-* `` --uid `id -u` ``:  No need to change this command. Here `` `id -u` ``will obtain your user id on your local machine. This parameter is extremely crucial and it allows you (local user) to have permissions and ownership to all output files that produced by docker and Snakemake. Docker by default will create all files under `USER root` which is extremely inconvenient. However, the change of ownership from root to local user will only be done after all output has finished. If your program is killed or stopped before finish the pipeline, the output file can still be owner by root.&#x20;
+* `` --uid `id -u` ``:  No need to change this command. Here `` `id -u` ``will obtain your user id on your local machine. This parameter is extremely crucial and it allows you (local user) to have permissions and ownership to all output files that produced by docker and Snakemake. Docker by default will create all files under `USER root` which is extremely inconvenient. However, the change of ownership from root to local user will only be done after all output has finished. If your program is killed or stopped before finish the pipeline, the output file can still be owner by root.
 * `` --gid `id -g` ``: No need to change this command. Here `` `id -g` ``will obtain your group id on your local machine.
 
 ### Running time of the pipeline
@@ -176,27 +174,28 @@ add benchmark with test data.
 
 
 
-## Output of sciMARGI-docker pipeline
+## Output of MUSIC-docker pipeline
 
-The output folder includes all intermediate files for users to check and potential making use of. Briefly we have 6 major folder corresponds to each step. Detailed description of each step can be found in [Broken link](broken-reference "mention").&#x20;
+The output folder includes all intermediate files for users to check and potential making use of. Briefly we have 6 major folder corresponds to each step.
+
 
 | Output name         | Description                                                        | Major files within                                                                                                                                                                      |
 | ------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | /0\_index           | contains bowtie2 and STAR index.                                   | <ul><li>/0_index/bowtie2</li><li>/0_index/STAR</li></ul>                                                                                                                                |
-| /1\_decode          | Demultiplexed and cleaned fastq files for DNA and RNA ends.        | <ul><li>lib*_DNA(RNA)end_decode.fq (after demultiplexed)</li><li>lib*_cutadap_trimed_DNA(RNA)end_decode.fq (adaptors, artifacts removed)</li><li>lib*_stats.log</li></ul>               |
-| /2\_DNAmapping      | Sorted uniquely mapped, mapq>20 DNA reads. Also mapping log file.  | <ul><li>bowtie2_mapq20_lib*.sorted.bam</li><li>bowtie2_mapq20_lib*.stats.txt</li></ul>                                                                                                  |
+| /1\_decode          | Demultiplexed and cleaned fastq files for DNA and RNA ends.        | <ul><li>lib\*_DNA(RNA)end_decode.fq (after demultiplexed)</li><li>lib\*_cutadap_trimed_DNA(RNA)end_decode.fq (adaptors, artifacts removed)</li><li>lib\*_stats.log</li></ul>               |
+| /2\_DNAmapping      | Sorted uniquely mapped, mapq>20 DNA reads. Also mapping log file.  | <ul><li>bowtie2_mapq20_lib\*.sorted.bam</li><li>bowtie2_mapq20_lib*.stats.txt</li></ul>                                                                                                  |
 | /3\_RNAmapping      | STAR RNA mapping results output folder                             | <ul><li>STAR output folder like</li><li>STAR_mapq255_lib*.bam (only mapq>=255 reads)</li></ul>                                                                                          |
-| /4\_dedup           | Dedupped and sorted DNA and RNA uniquely mapped bam file.          | <ul><li>bowtie2_mapq20_lib*.sorted.dedup.bam</li><li>RNA_STAR_mapq255_lib*.sorted.dedup.bam</li></ul>                                                                                   |
+| /4\_dedup           | Dedupped and sorted DNA and RNA uniquely mapped bam file.          | <ul><li>bowtie2_mapq20_lib\*.sorted.dedup.bam</li><li>RNA_STAR_mapq255_lib*.sorted.dedup.bam</li></ul>                                                                                   |
 | /5\_merge           | merged bam files from all libs.                                    | <ul><li>merge_DNA.sort.bam</li><li>merge_RNA.sort.bam</li></ul>                                                                                                                         |
 | /6\_stats           | Cell and cluster size, DNA/RNA reads abundance statstitics.        | <ul><li>merge_DNA(RNA).sort.cell_clusters.csv</li><li>merge_DNA(RNA).sort.cell_reads.csv</li><li>merge_DNA(RNA).sort.clusters_size.csv</li><li>merge.sort.cluster_rna_dna.csv</li></ul> |
-| Library\_stats.docx | Summary statsitcis of each step.                                   |                                                                                                                                                                                         |
+| Library\_stats.docx | Summary statsitcis of each step.                                   | <ul><li>NA</li></ul>                   |
 
 
 
 The full tree structure of the final output folder will look like:
 
 ```
-> tree /local_path/sciMARGI_input_folder/output/
+> tree /local_path/MUSIC_input_folder/output/
 
 ├── 0_index
 │   ├── bowtie2

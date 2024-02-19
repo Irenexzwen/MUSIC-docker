@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Run sciMARGI-tool pipeline in Docker &mdash; sciMARGI-tool 0.0.1 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Run MUSIC-tool pipeline in Docker &mdash; MUSIC-docker 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+    <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-    <script src="../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data processing step-by-step" href="step.html" />
+    <link rel="prev" title="MUSIC Introduction" href="intro.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -26,21 +26,37 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> sciMARGI-tool
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MUSIC-docker
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../rst/scimargiintro.html">sciMARGI Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rst/runscimargidocker.html">Run sciMARGI-tool pipeline in Docker</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rst/step.html">Data processing step-by-step</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">MUSIC Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Run MUSIC-tool pipeline in Docker</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-docker-on-your-system">Install Docker on your system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-music-tool-image">Install MUSIC-tool image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-music-docker">Run MUSIC-docker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data-preparation">Data preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#initiate-the-music-tool-image">Initiate the MUSIC-tool image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-time-of-the-pipeline">Running time of the pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#output-of-music-docker-pipeline">Output of MUSIC-docker pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="step.html">Data processing step-by-step</a></li>
 </ul>
 
         </div>
@@ -49,15 +65,15 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">sciMARGI-tool</a>
+          <a href="index.html">MUSIC-docker</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Run sciMARGI-tool pipeline in Docker</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Run MUSIC-tool pipeline in Docker</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -66,34 +82,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="run-scimargi-tool-pipeline-in-docker">
-<h1>Run sciMARGI-tool pipeline in Docker<a class="headerlink" href="#run-scimargi-tool-pipeline-in-docker" title="Permalink to this heading">¶</a></h1>
+  <section id="run-music-tool-pipeline-in-docker">
+<h1>Run MUSIC-tool pipeline in Docker<a class="headerlink" href="#run-music-tool-pipeline-in-docker" title="Permalink to this heading">¶</a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
-<p>sciMARGI-docker is a tool designed to provide a one-stop solution for processing sciMARGI data. It is a docker image that wraps a Snakemake pipeline. sciMARGI-docker combines the power of Docker and Snakemake to provide a one-stop solution for processing sciMARGI data. It allows you to easily deploy and run the sciMARGI pipeline in a reproducible and efficient way, making it easier to manage and automate the data processing process.</p>
-<figure><img src="../.gitbook/assets/sciMARGI_pipeline.png" alt=""><figcaption><p>sciMARGI-docker overview</p></figcaption></figure><p>.. note::
-<strong>Why we choose docker?</strong></p>
+<p>MUSIC-docker is a tool designed to provide a one-stop solution for processing MUSIC data. It is a docker image that wraps a Snakemake pipeline. MUSIC-docker combines the power of Docker and Snakemake to provide a one-stop solution for processing MUSIC data. It allows you to easily deploy and run the MUSIC pipeline in a reproducible and efficient way, making it easier to manage and automate the data processing process.</p>
+<figure><img src="_images/docker_pipeline.png" alt=""><figcaption><p>MUSIC-docker overview</p></figcaption></figure><p><strong>Why we choose docker?</strong></p>
 <p>Docker is a tool for packaging and deploying applications in lightweight containers. It allows you to package an application and its dependencies in a single container, making it easy to deploy and run on any platform. The philosophy behind Docker is to make it easier to create, deploy, and run applications by packaging them in containers. You can find more information about Docker and how to use it in the official Docker documentation at <a class="reference external" href="https://docs.docker.com/">https://docs.docker.com/</a>.</p>
-<p>.. note::
-Why we choose Snakemake?</p>
+<p><strong>Why we choose Snakemake?</strong></p>
 <p>Snakemake is a workflow management system that allows you to define and run complex pipelines in a reproducible and efficient way. It is designed to be scalable, flexible, and easy to use, with a simple yet powerful syntax for defining workflows. The philosophy behind Snakemake is to provide a simple and intuitive way to define and run complex pipelines, making it easier to manage and automate complex workflow processes. You can find more information about Snakemake and how to use it in the official Snakemake documentation at <a class="reference external" href="https://snakemake.readthedocs.io/">https://snakemake.readthedocs.io/</a>.</p>
 </section>
 <section id="install-docker-on-your-system">
 <h2>Install Docker on your system<a class="headerlink" href="#install-docker-on-your-system" title="Permalink to this heading">¶</a></h2>
 <p>If you don’t have docker installed, please follow the instructions from docker docs: <a class="reference external" href="https://docs.docker.com/engine/install/">https://docs.docker.com/engine/install/</a></p>
 </section>
-<section id="install-scimargi-tool-image">
-<h2>Install sciMARGI-tool image<a class="headerlink" href="#install-scimargi-tool-image" title="Permalink to this heading">¶</a></h2>
-<p>sciMARGI-tool has now been uploaded to docker cloud, which means you can install the container  by <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">pull</span></code> command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">zhonglab</span><span class="o">/</span><span class="n">scimargi</span>
+<section id="install-music-tool-image">
+<h2>Install MUSIC-tool image<a class="headerlink" href="#install-music-tool-image" title="Permalink to this heading">¶</a></h2>
+<p>MUSIC-tool has now been uploaded to docker cloud, which means you can install the container  by <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">pull</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">irenexzwen</span><span class="o">/</span><span class="n">music_docker</span>
 </pre></div>
 </div>
 </section>
-<section id="run-scimargi-docker">
-<h2>Run sciMARGI-docker<a class="headerlink" href="#run-scimargi-docker" title="Permalink to this heading">¶</a></h2>
+<section id="run-music-docker">
+<h2>Run MUSIC-docker<a class="headerlink" href="#run-music-docker" title="Permalink to this heading">¶</a></h2>
 <section id="data-preparation">
 <h3>Data preparation<a class="headerlink" href="#data-preparation" title="Permalink to this heading">¶</a></h3>
-<p>To run sciMARGI-tool locally, we first need to prepare the following input files in a structured directory. The docker image (created from sciMARGI-tool container) will run in an independent virtual enviornment. The only way for the image to communicate with your local file is through the <code class="docutils literal notranslate"><span class="pre">mount</span></code> command. Softwares running inside the docker image will recognize input files with the path inside the docker enviornment but not the file path on your local machine. So it is cruial to keep your input files in a structured directory and pass down parameters using relative path. </p>
+<p>To run MUSIC-tool locally, we first need to prepare the following input files in a structured directory. The docker image (created from MUSIC-tool container) will run in an independent virtual enviornment. The only way for the image to communicate with your local file is through the <code class="docutils literal notranslate"><span class="pre">mount</span></code> command. Softwares running inside the docker image will recognize input files with the path inside the docker enviornment but not the file path on your local machine. So it is cruial to keep your input files in a structured directory and pass down parameters using relative path.</p>
 <p><strong>Required input files:</strong></p>
 <table border="1" class="docutils">
 <thead>
@@ -126,7 +140,7 @@ Why we choose Snakemake?</p>
 </tr>
 </tbody>
 </table><p>On your local machine prepare a input folder structured as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&gt; tree local_path/sciMARGI_input_folder/
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&gt; tree local_path/MUSIC_input_folder/
 
 ├── data
 │   ├── lib1_S1_R1_001.fastq.gz
@@ -201,19 +215,19 @@ Notice that the output folder is necessary (even though it is empty right now), 
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>These are all required input files for sciMARGI-tool to run! </p>
+<p>These are all required input files for MUSIC-tool to run!</p>
 </section>
-<section id="initiate-the-scimargi-tool-image">
-<h3>Initiate the sciMARGI-tool image<a class="headerlink" href="#initiate-the-scimargi-tool-image" title="Permalink to this heading">¶</a></h3>
-<p>After all input files are ready, we are ready to initiate the pipelline with <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span></code> command. </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># download sciMARGI-tool docker image:
-docker pull zhonglab/scimargi:latest
+<section id="initiate-the-music-tool-image">
+<h3>Initiate the MUSIC-tool image<a class="headerlink" href="#initiate-the-music-tool-image" title="Permalink to this heading">¶</a></h3>
+<p>After all input files are ready, we are ready to initiate the pipelline with <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span></code> command.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># download MUSIC-tool docker image:
+docker pull zhonglab/MUSIC:latest
 
 # run the pipeline
 docker run --rm \
-        -v /local_path/sciMARGI_input_folder/:/input \
-        -v /local_path/sciMARGI_input_folder/output/:/snakemake/outputs \
-        scimargi:latest \
+        -v /local_path/MUSIC_input_folder/:/input \
+        -v /local_path/MUSIC_input_folder/output/:/snakemake/outputs \
+        MUSIC:latest \
         --sample-json /input/data/samples.json \
         --num-jobs 20 \
         --name mysample \
@@ -226,13 +240,13 @@ docker run --rm \
 <p><em>Parameters explaination:</em></p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">--rm</span></code> : By default, when a container exits, it is not removed and can still be inspected and restarted using the <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">start</span></code> command. However, if the <code class="docutils literal notranslate"><span class="pre">--rm</span></code> flag is specified, the container will be automatically removed once it exits. This can be useful for cleaning up after a one-time task, as it ensures that the system does not accumulate stopped containers that are no longer needed.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">-v</span></code>:  The <code class="docutils literal notranslate"><span class="pre">-v</span></code> flag is used with the <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span></code> command to bind-mount a volume from the host system into a container. This allows you to share data between the host system and the container, or to persist data that is generated within the container beyond the lifetime of the container. the host path and the container path separated by a colon (<code class="docutils literal notranslate"><span class="pre">:</span></code>). In our command, we mount twice, the first one is <code class="docutils literal notranslate"><span class="pre">-v</span> <span class="pre">/local_path/sciMARGI_input_folder/:/input</span></code> which mount the local input folder to folder <code class="docutils literal notranslate"><span class="pre">/input</span></code> in docker image. As you could see, later when we specify other parameters such as <code class="docutils literal notranslate"><span class="pre">-fa,</span> <span class="pre">-gtf</span></code> , we will use the new path that is in docker image as “/input/ref/**.fa”.  The second one is <code class="docutils literal notranslate"><span class="pre">-v</span> <span class="pre">/local_path/sciMARGI_input_folder/out/:/snakemake/outputs</span></code> which is used to map docker produced output back to our local folder. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">scimargi:latest</span></code>: Before adding other customized parameters, we need to specify the image name, which is usually <code class="docutils literal notranslate"><span class="pre">name:tag</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">--sample-json</span></code>: Location of the samples.json file inside the docker, not local file path. No need to change the default if you structured your input folder as we suggested. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">--num-jobs</span></code>: Threads for running the job. Snakemake will automatically distribute cpus to all jobs in a very efficient manner. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">--fa</span></code>: Location of the reference genome fasta file inside the docker, not local file path. No need to change the default if you structured your input folder as we suggested. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-v</span></code>:  The <code class="docutils literal notranslate"><span class="pre">-v</span></code> flag is used with the <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span></code> command to bind-mount a volume from the host system into a container. This allows you to share data between the host system and the container, or to persist data that is generated within the container beyond the lifetime of the container. the host path and the container path separated by a colon (<code class="docutils literal notranslate"><span class="pre">:</span></code>). In our command, we mount twice, the first one is <code class="docutils literal notranslate"><span class="pre">-v</span> <span class="pre">/local_path/MUSIC_input_folder/:/input</span></code> which mount the local input folder to folder <code class="docutils literal notranslate"><span class="pre">/input</span></code> in docker image. As you could see, later when we specify other parameters such as <code class="docutils literal notranslate"><span class="pre">-fa,</span> <span class="pre">-gtf</span></code> , we will use the new path that is in docker image as “/input/ref/**.fa”.  The second one is <code class="docutils literal notranslate"><span class="pre">-v</span> <span class="pre">/local_path/MUSIC_input_folder/out/:/snakemake/outputs</span></code> which is used to map docker produced output back to our local folder.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MUSIC:latest</span></code>: Before adding other customized parameters, we need to specify the image name, which is usually <code class="docutils literal notranslate"><span class="pre">name:tag</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--sample-json</span></code>: Location of the samples.json file inside the docker, not local file path. No need to change the default if you structured your input folder as we suggested.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--num-jobs</span></code>: Threads for running the job. Snakemake will automatically distribute cpus to all jobs in a very efficient manner.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--fa</span></code>: Location of the reference genome fasta file inside the docker, not local file path. No need to change the default if you structured your input folder as we suggested.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--gtf</span></code>: Similar to <code class="docutils literal notranslate"><span class="pre">--fa</span></code>, but for location of the reference genome gtf file.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">--uid</span> <span class="pre">`id</span> <span class="pre">-u`</span></code>:  No need to change this command. Here <code class="docutils literal notranslate"><span class="pre">`id</span> <span class="pre">-u`</span></code>will obtain your user id on your local machine. This parameter is extremely crucial and it allows you (local user) to have permissions and ownership to all output files that produced by docker and Snakemake. Docker by default will create all files under <code class="docutils literal notranslate"><span class="pre">USER</span> <span class="pre">root</span></code> which is extremely inconvenient. However, the change of ownership from root to local user will only be done after all output has finished. If your program is killed or stopped before finish the pipeline, the output file can still be owner by root. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--uid</span> <span class="pre">`id</span> <span class="pre">-u`</span></code>:  No need to change this command. Here <code class="docutils literal notranslate"><span class="pre">`id</span> <span class="pre">-u`</span></code>will obtain your user id on your local machine. This parameter is extremely crucial and it allows you (local user) to have permissions and ownership to all output files that produced by docker and Snakemake. Docker by default will create all files under <code class="docutils literal notranslate"><span class="pre">USER</span> <span class="pre">root</span></code> which is extremely inconvenient. However, the change of ownership from root to local user will only be done after all output has finished. If your program is killed or stopped before finish the pipeline, the output file can still be owner by root.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--gid</span> <span class="pre">`id</span> <span class="pre">-g`</span></code>: No need to change this command. Here <code class="docutils literal notranslate"><span class="pre">`id</span> <span class="pre">-g`</span></code>will obtain your group id on your local machine.</p></li>
 </ul>
 </section>
@@ -243,9 +257,9 @@ add benchmark with test data.
 {% endhint %}</p>
 </section>
 </section>
-<section id="output-of-scimargi-docker-pipeline">
-<h2>Output of sciMARGI-docker pipeline<a class="headerlink" href="#output-of-scimargi-docker-pipeline" title="Permalink to this heading">¶</a></h2>
-<p>The output folder includes all intermediate files for users to check and potential making use of. Briefly we have 6 major folder corresponds to each step. Detailed description of each step can be found in <a class="reference external" href="broken-reference">Broken link</a>. </p>
+<section id="output-of-music-docker-pipeline">
+<h2>Output of MUSIC-docker pipeline<a class="headerlink" href="#output-of-music-docker-pipeline" title="Permalink to this heading">¶</a></h2>
+<p>The output folder includes all intermediate files for users to check and potential making use of. Briefly we have 6 major folder corresponds to each step.</p>
 <table border="1" class="docutils">
 <thead>
 <tr>
@@ -263,12 +277,12 @@ add benchmark with test data.
 <tr>
 <td>/1_decode</td>
 <td>Demultiplexed and cleaned fastq files for DNA and RNA ends.</td>
-<td><ul><li>lib<em>_DNA(RNA)end_decode.fq (after demultiplexed)</li><li>lib</em>_cutadap_trimed_DNA(RNA)end_decode.fq (adaptors, artifacts removed)</li><li>lib*_stats.log</li></ul></td>
+<td><ul><li>lib*_DNA(RNA)end_decode.fq (after demultiplexed)</li><li>lib*_cutadap_trimed_DNA(RNA)end_decode.fq (adaptors, artifacts removed)</li><li>lib*_stats.log</li></ul></td>
 </tr>
 <tr>
 <td>/2_DNAmapping</td>
 <td>Sorted uniquely mapped, mapq&gt;20 DNA reads. Also mapping log file.</td>
-<td><ul><li>bowtie2_mapq20_lib<em>.sorted.bam</li><li>bowtie2_mapq20_lib</em>.stats.txt</li></ul></td>
+<td><ul><li>bowtie2_mapq20_lib*.sorted.bam</li><li>bowtie2_mapq20_lib*.stats.txt</li></ul></td>
 </tr>
 <tr>
 <td>/3_RNAmapping</td>
@@ -278,7 +292,7 @@ add benchmark with test data.
 <tr>
 <td>/4_dedup</td>
 <td>Dedupped and sorted DNA and RNA uniquely mapped bam file.</td>
-<td><ul><li>bowtie2_mapq20_lib<em>.sorted.dedup.bam</li><li>RNA_STAR_mapq255_lib</em>.sorted.dedup.bam</li></ul></td>
+<td><ul><li>bowtie2_mapq20_lib*.sorted.dedup.bam</li><li>RNA_STAR_mapq255_lib*.sorted.dedup.bam</li></ul></td>
 </tr>
 <tr>
 <td>/5_merge</td>
@@ -293,11 +307,11 @@ add benchmark with test data.
 <tr>
 <td>Library_stats.docx</td>
 <td>Summary statsitcis of each step.</td>
-<td></td>
+<td><ul><li>NA</li></ul></td>
 </tr>
 </tbody>
 </table><p>The full tree structure of the final output folder will look like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&gt; tree /local_path/sciMARGI_input_folder/output/
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&gt; tree /local_path/MUSIC_input_folder/output/
 
 ├── 0_index
 │   ├── bowtie2
@@ -549,7 +563,10 @@ add benchmark with test data.
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="intro.html" class="btn btn-neutral float-left" title="MUSIC Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="step.html" class="btn btn-neutral float-right" title="Data processing step-by-step" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

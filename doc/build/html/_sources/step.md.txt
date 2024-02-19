@@ -2,7 +2,7 @@
 
 ## Demultiplexing
 
-<figure><img src="../.gitbook/assets/Library_configuration.png" alt=""><figcaption><p>sciMARGI library configuration</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/Library_configuration.png" alt=""><figcaption><p>MUSIC library configuration</p></figcaption></figure>
 
 Demultiplexing is the step to extract the following important informations from the sequencing reads and output insertions with barcode, UMI information as the read name.&#x20;
 
@@ -121,7 +121,7 @@ In Snakemake pipeline we used the following command to remove known artifacts fr
 cutadapt -a 'A{{20}}' -a 'G{{20}}' -m 20 -j {threads} -o {output.trimed_DNA} {input.decode_DNA}
 
 // For RNA reads
-cutadapt -g 'C{{25}}' -a 'T{{25}}' -a 'A{{100}}' -m 20 -j {threads} -o {output.trimed_RNA} {input.decode_RNA}
+cutadapt -a CGAGGAGCGCTT -a 'A{{20}}N{{20}}' -q 15 -m 20 -j {threads} -o {output.trimed_RNA} {input.decode_RNA}
 ```
 
 ## Mapping DNA and RNA ends
@@ -257,7 +257,7 @@ The bam output is compressed and can be easily imported and processed by widely 
 
 ### `Summary report`
 
-sciMARGI is designed as a single-cell single molecule method. It is highly useful for users to get an idea of the per cell reads, per molecular cluster reads quantity and distribution.  To this end, we derived the following summary files:
+MUSIC is designed as a single-cell single molecule method. It is highly useful for users to get an idea of the per cell reads, per molecular cluster reads quantity and distribution.  To this end, we derived the following summary files:
 
 | File names                                     | Description                                                                                                                                                                                                                                |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

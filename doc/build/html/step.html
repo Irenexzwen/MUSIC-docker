@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data processing step-by-step &mdash; sciMARGI-tool 0.0.1 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Data processing step-by-step &mdash; MUSIC-docker 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+    <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-    <script src="../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Run MUSIC-tool pipeline in Docker" href="rundocker.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -26,21 +25,49 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> sciMARGI-tool
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MUSIC-docker
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../rst/scimargiintro.html">sciMARGI Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rst/runscimargidocker.html">Run sciMARGI-tool pipeline in Docker</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rst/step.html">Data processing step-by-step</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">MUSIC Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rundocker.html">Run MUSIC-tool pipeline in Docker</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data processing step-by-step</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#demultiplexing">Demultiplexing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#demultiplexing-program">Demultiplexing program</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#reads-cleaning">Reads cleaning</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#reads-cleaning-program">Reads cleaning program</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mapping-dna-and-rna-ends">Mapping DNA and RNA ends</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#building-index-program">Building index program</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reads-mapping-program">Reads mapping program</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#reads-deduplication">Reads deduplication</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dedup-program">Dedup program</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#final-output-and-summary-report">Final output and summary report</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#merge-bam-files-from-individual-library">Merge bam files from individual library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#summary-report"><code class="docutils literal notranslate"><span class="pre">Summary</span> <span class="pre">report</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -49,15 +76,15 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">sciMARGI-tool</a>
+          <a href="index.html">MUSIC-docker</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Data processing step-by-step</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Data processing step-by-step</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -70,7 +97,7 @@
 <h1>Data processing step-by-step<a class="headerlink" href="#data-processing-step-by-step" title="Permalink to this heading">¶</a></h1>
 <section id="demultiplexing">
 <h2>Demultiplexing<a class="headerlink" href="#demultiplexing" title="Permalink to this heading">¶</a></h2>
-<figure><img src="../.gitbook/assets/Library_configuration.png" alt=""><figcaption><p>sciMARGI library configuration</p></figcaption></figure><p>Demultiplexing is the step to extract the following important informations from the sequencing reads and output insertions with barcode, UMI information as the read name. </p>
+<figure><img src="../.gitbook/assets/Library_configuration.png" alt=""><figcaption><p>MUSIC library configuration</p></figcaption></figure><p>Demultiplexing is the step to extract the following important informations from the sequencing reads and output insertions with barcode, UMI information as the read name. </p>
 <table border="1" class="docutils">
 <thead>
 <tr>
@@ -224,7 +251,7 @@
 <span class="n">cutadapt</span> <span class="o">-</span><span class="n">a</span> <span class="s1">&#39;A{{20}}&#39;</span> <span class="o">-</span><span class="n">a</span> <span class="s1">&#39;G{{20}}&#39;</span> <span class="o">-</span><span class="n">m</span> <span class="mi">20</span> <span class="o">-</span><span class="n">j</span> <span class="p">{</span><span class="n">threads</span><span class="p">}</span> <span class="o">-</span><span class="n">o</span> <span class="p">{</span><span class="n">output</span><span class="o">.</span><span class="n">trimed_DNA</span><span class="p">}</span> <span class="p">{</span><span class="nb">input</span><span class="o">.</span><span class="n">decode_DNA</span><span class="p">}</span>
 
 <span class="o">//</span> <span class="n">For</span> <span class="n">RNA</span> <span class="n">reads</span>
-<span class="n">cutadapt</span> <span class="o">-</span><span class="n">g</span> <span class="s1">&#39;C{{25}}&#39;</span> <span class="o">-</span><span class="n">a</span> <span class="s1">&#39;T{{25}}&#39;</span> <span class="o">-</span><span class="n">a</span> <span class="s1">&#39;A{{100}}&#39;</span> <span class="o">-</span><span class="n">m</span> <span class="mi">20</span> <span class="o">-</span><span class="n">j</span> <span class="p">{</span><span class="n">threads</span><span class="p">}</span> <span class="o">-</span><span class="n">o</span> <span class="p">{</span><span class="n">output</span><span class="o">.</span><span class="n">trimed_RNA</span><span class="p">}</span> <span class="p">{</span><span class="nb">input</span><span class="o">.</span><span class="n">decode_RNA</span><span class="p">}</span>
+<span class="n">cutadapt</span> <span class="o">-</span><span class="n">a</span> <span class="n">CGAGGAGCGCTT</span> <span class="o">-</span><span class="n">a</span> <span class="s1">&#39;A{{20}}N{{20}}&#39;</span> <span class="o">-</span><span class="n">q</span> <span class="mi">15</span> <span class="o">-</span><span class="n">m</span> <span class="mi">20</span> <span class="o">-</span><span class="n">j</span> <span class="p">{</span><span class="n">threads</span><span class="p">}</span> <span class="o">-</span><span class="n">o</span> <span class="p">{</span><span class="n">output</span><span class="o">.</span><span class="n">trimed_RNA</span><span class="p">}</span> <span class="p">{</span><span class="nb">input</span><span class="o">.</span><span class="n">decode_RNA</span><span class="p">}</span>
 </pre></div>
 </div>
 </section>
@@ -368,7 +395,7 @@
 </section>
 <section id="summary-report">
 <h3><code class="docutils literal notranslate"><span class="pre">Summary</span> <span class="pre">report</span></code><a class="headerlink" href="#summary-report" title="Permalink to this heading">¶</a></h3>
-<p>sciMARGI is designed as a single-cell single molecule method. It is highly useful for users to get an idea of the per cell reads, per molecular cluster reads quantity and distribution.  To this end, we derived the following summary files:</p>
+<p>MUSIC is designed as a single-cell single molecule method. It is highly useful for users to get an idea of the per cell reads, per molecular cluster reads quantity and distribution.  To this end, we derived the following summary files:</p>
 <table border="1" class="docutils">
 <thead>
 <tr>
@@ -401,7 +428,9 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rundocker.html" class="btn btn-neutral float-left" title="Run MUSIC-tool pipeline in Docker" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
 
   <hr/>
 

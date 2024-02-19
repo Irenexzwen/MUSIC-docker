@@ -19,7 +19,7 @@ from recommonmark.transform import AutoStructify
 
 # -- Project information -----------------------------------------------------
 
-project = 'sciMARGI-tool'
+project = 'MUSIC-docker'
 copyright = '2023, Zhong Lab, UCSD. Author: Xingzhao Wen'
 author = 'Xingzhao Wen'
 

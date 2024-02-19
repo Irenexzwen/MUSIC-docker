@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to sciMARGI_tools's documentation!
+Welcome to MUSIC-tool documentation!
 ==========================================
 
 .. toctree::
@@ -11,9 +11,9 @@ Welcome to sciMARGI_tools's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   rst/scimargiintro.rst
-   rst/runscimargidocker.rst
-   rst/step.rst
+   intro.md
+   rundocker.md
+   step.md
 
 
 
