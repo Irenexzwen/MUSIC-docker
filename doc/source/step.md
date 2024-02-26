@@ -97,7 +97,7 @@ Sample stats\_log:
 
 ```
 // Some code
-2023-01-02 02:09:58,776 INFO     ---- start ----
+2023-01-02 02:09:58,776 INFO     ---- Start ----
 2023-01-02 02:10:02,958 INFO     ---- read in 10X BC ----
 2023-01-02 02:10:09,158 INFO     ---- finish constructing barcode ----
 2023-01-02 02:13:39,927 INFO     total lines in file /input/data/lib5_S5_R1_001.fastq.gz : 4016146
@@ -126,28 +126,30 @@ cutadapt -a CGAGGAGCGCTT -a 'A{{20}}N{{20}}' -q 15 -m 20 -j {threads} -o {output
 
 ## Mapping DNA and RNA ends
 
-After raw reads demultiplexing and reads cleaning, we will map DNA ends and RNA ends to reference genome individually. We chose bowtie2 for DNA ends genome mapping and STAR to map RNA ends to genome in a splice aware manner.&#x20;
+After raw reads demultiplexing and reads cleaning, we will map DNA ends and RNA ends to reference genome individually. We chose bowtie2 for DNA ends genome mapping and BWA to map RNA ends to genome in a splice aware manner.&#x20;
 
-Before mapping, we need to construct the indexes for both bowtie2 and STAR. The input file for the index construction is the reference fasta file, and gtf file. We chose to build index using snakemake pipeline instead of accepting pre-built index from users. We will sacrifice some time for building the index but will avoid the software compatibility headache.&#x20;
+
+Prior to mapping, it is necessary to generate the indexes for both bowtie2 and BWA. The reference fasta file and gtf file are used as input for index construction. In order to ensure software compatibility and avoid potential issues, we have opted to build the indexes within the snakemake pipeline, rather than relying on pre-built indexes provided by users. Although this approach may require additional time for index generation, it helps to streamline the workflow and minimize compatibility concerns.
+
 
 ### Building index program
 
 | Type   | Description                                                                                                 |
 | ------ | ----------------------------------------------------------------------------------------------------------- |
 | Input  | <ol><li>reference genome <code>fasta</code> file.</li><li>reference genome <code>gtf</code> file.</li></ol> |
-| Output | <ol><li>bowtie2 index </li><li>STAR index</li></ol>                                                         |
+| Output | <ol><li>bowtie2 index </li><li>BWA index</li></ol>                                                         |
 
 The command to build index in Snakemake pipeline:
 
-{% code lineNumbers="true" %}
+
 ```
 // bowtie2
 bowtie2-build --threads {threads} {input.fasta_file} {params.basename}
 
-// STAR
-STAR --runThreadN {threads} --runMode genomeGenerate --genomeFastaFiles {input.fasta_file} --sjdbGTFfile {input.gtf_file} --genomeDir {output.index_dir}
+// BWA
+bwa index {input.fasta_file} -p {params.basename_bwa}
 ```
-{% endcode %}
+
 
 
 
@@ -160,17 +162,17 @@ STAR --runThreadN {threads} --runMode genomeGenerate --genomeFastaFiles {input.f
 
 The command in Snakemake pipeline:
 
-{% code lineNumbers="true" %}
+
 ```
 # DNA mapping and sorting using bowtie2
 bowtie2 -p {threads} -t --phred33 -x {params.index_prefix} -U {input.DNA_fq} 2> {output.human_bowtie2_stats}| samtools view -bq 20 -F 4 -F 256 - | samtools sort -@ 10 -m 64G -O bam -o {output.DNA_human_bam}
 
 # RNA reads mapping and bam file sorting
-STAR --runThreadN {threads} --genomeDir {input.index_dir} --readFilesIn {input.non_rRNA_fq} --outSAMtype BAM SortedByCoordinate --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0.5 --outFilterMatchNmin 15 --outFileNamePrefix {config[dir_names][mapped_RNA_dir]}{params}/{params}_human_
-samtools view -bq 255 -F 4 -F 256 {config[dir_names][mapped_RNA_dir]}{params}/{params}_human_Aligned.sortedByCoord.out.bam | samtools sort -@ 10 -m 64G -O bam -o {output.STAR_human_bam}
-samtools index {output.STAR_human_bam}
+bwa mem -t {threads} -SP5M {params.index_prefix} {input.non_rRNA_fq} | sambamba view -S -t {threads} -h -f bam -F "mapping_quality >= 1 and not (unmapped or secondary_alignment) and not ([XA] != null or [SA] != null)" /dev/stdin | sambamba sort -o {output.BWA_human_bam} /dev/stdin
+
+samtools index {output.BWA_human_bam}
 ```
-{% endcode %}
+
 
 The reads mapping, bam file sorting and indexing are using multi threads to accelerate. User only need to specify the total cpu that is available and all details will be taken care of by Snakemake.&#x20;
 
@@ -255,7 +257,7 @@ A00953:623:HHY3CDSX3:3:2133:13548:8046|BC3_51-BC2_11-BC1_32-AGGACTTAGTCTTCCC-lib
 
 The bam output is compressed and can be easily imported and processed by widely used packages in `R` or `python`
 
-### `Summary report`
+### Summary report
 
 MUSIC is designed as a single-cell single molecule method. It is highly useful for users to get an idea of the per cell reads, per molecular cluster reads quantity and distribution.  To this end, we derived the following summary files:
 

@@ -63,7 +63,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#final-output-and-summary-report">Final output and summary report</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#merge-bam-files-from-individual-library">Merge bam files from individual library</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#summary-report"><code class="docutils literal notranslate"><span class="pre">Summary</span> <span class="pre">report</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#summary-report">Summary report</a></li>
 </ul>
 </li>
 </ul>
@@ -228,7 +228,7 @@
 </div>
 <p>Sample stats_log:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Some</span> <span class="n">code</span>
-<span class="mi">2023</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span> <span class="mi">02</span><span class="p">:</span><span class="mi">09</span><span class="p">:</span><span class="mi">58</span><span class="p">,</span><span class="mi">776</span> <span class="n">INFO</span>     <span class="o">----</span> <span class="n">start</span> <span class="o">----</span>
+<span class="mi">2023</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span> <span class="mi">02</span><span class="p">:</span><span class="mi">09</span><span class="p">:</span><span class="mi">58</span><span class="p">,</span><span class="mi">776</span> <span class="n">INFO</span>     <span class="o">----</span> <span class="n">Start</span> <span class="o">----</span>
 <span class="mi">2023</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span> <span class="mi">02</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">02</span><span class="p">,</span><span class="mi">958</span> <span class="n">INFO</span>     <span class="o">----</span> <span class="n">read</span> <span class="ow">in</span> <span class="mi">10</span><span class="n">X</span> <span class="n">BC</span> <span class="o">----</span>
 <span class="mi">2023</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span> <span class="mi">02</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">09</span><span class="p">,</span><span class="mi">158</span> <span class="n">INFO</span>     <span class="o">----</span> <span class="n">finish</span> <span class="n">constructing</span> <span class="n">barcode</span> <span class="o">----</span>
 <span class="mi">2023</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span> <span class="mi">02</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">39</span><span class="p">,</span><span class="mi">927</span> <span class="n">INFO</span>     <span class="n">total</span> <span class="n">lines</span> <span class="ow">in</span> <span class="n">file</span> <span class="o">/</span><span class="nb">input</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lib5_S5_R1_001</span><span class="o">.</span><span class="n">fastq</span><span class="o">.</span><span class="n">gz</span> <span class="p">:</span> <span class="mi">4016146</span>
@@ -258,8 +258,8 @@
 </section>
 <section id="mapping-dna-and-rna-ends">
 <h2>Mapping DNA and RNA ends<a class="headerlink" href="#mapping-dna-and-rna-ends" title="Permalink to this heading">¶</a></h2>
-<p>After raw reads demultiplexing and reads cleaning, we will map DNA ends and RNA ends to reference genome individually. We chose bowtie2 for DNA ends genome mapping and STAR to map RNA ends to genome in a splice aware manner. </p>
-<p>Before mapping, we need to construct the indexes for both bowtie2 and STAR. The input file for the index construction is the reference fasta file, and gtf file. We chose to build index using snakemake pipeline instead of accepting pre-built index from users. We will sacrifice some time for building the index but will avoid the software compatibility headache. </p>
+<p>After raw reads demultiplexing and reads cleaning, we will map DNA ends and RNA ends to reference genome individually. We chose bowtie2 for DNA ends genome mapping and BWA to map RNA ends to genome in a splice aware manner. </p>
+<p>Prior to mapping, it is necessary to generate the indexes for both bowtie2 and BWA. The reference fasta file and gtf file are used as input for index construction. In order to ensure software compatibility and avoid potential issues, we have opted to build the indexes within the snakemake pipeline, rather than relying on pre-built indexes provided by users. Although this approach may require additional time for index generation, it helps to streamline the workflow and minimize compatibility concerns.</p>
 <section id="building-index-program">
 <h3>Building index program<a class="headerlink" href="#building-index-program" title="Permalink to this heading">¶</a></h3>
 <table border="1" class="docutils">
@@ -276,19 +276,17 @@
 </tr>
 <tr>
 <td>Output</td>
-<td><ol><li>bowtie2 index </li><li>STAR index</li></ol></td>
+<td><ol><li>bowtie2 index </li><li>BWA index</li></ol></td>
 </tr>
 </tbody>
 </table><p>The command to build index in Snakemake pipeline:</p>
-<p>{% code lineNumbers=”true” %}</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">bowtie2</span>
 <span class="n">bowtie2</span><span class="o">-</span><span class="n">build</span> <span class="o">--</span><span class="n">threads</span> <span class="p">{</span><span class="n">threads</span><span class="p">}</span> <span class="p">{</span><span class="nb">input</span><span class="o">.</span><span class="n">fasta_file</span><span class="p">}</span> <span class="p">{</span><span class="n">params</span><span class="o">.</span><span class="n">basename</span><span class="p">}</span>
 
-<span class="o">//</span> <span class="n">STAR</span>
-<span class="n">STAR</span> <span class="o">--</span><span class="n">runThreadN</span> <span class="p">{</span><span class="n">threads</span><span class="p">}</span> <span class="o">--</span><span class="n">runMode</span> <span class="n">genomeGenerate</span> <span class="o">--</span><span class="n">genomeFastaFiles</span> <span class="p">{</span><span class="nb">input</span><span class="o">.</span><span class="n">fasta_file</span><span class="p">}</span> <span class="o">--</span><span class="n">sjdbGTFfile</span> <span class="p">{</span><span class="nb">input</span><span class="o">.</span><span class="n">gtf_file</span><span class="p">}</span> <span class="o">--</span><span class="n">genomeDir</span> <span class="p">{</span><span class="n">output</span><span class="o">.</span><span class="n">index_dir</span><span class="p">}</span>
+<span class="o">//</span> <span class="n">BWA</span>
+<span class="n">bwa</span> <span class="n">index</span> <span class="p">{</span><span class="nb">input</span><span class="o">.</span><span class="n">fasta_file</span><span class="p">}</span> <span class="o">-</span><span class="n">p</span> <span class="p">{</span><span class="n">params</span><span class="o">.</span><span class="n">basename_bwa</span><span class="p">}</span>
 </pre></div>
 </div>
-<p>{% endcode %}</p>
 </section>
 <section id="reads-mapping-program">
 <h3>Reads mapping program<a class="headerlink" href="#reads-mapping-program" title="Permalink to this heading">¶</a></h3>
@@ -310,17 +308,15 @@
 </tr>
 </tbody>
 </table><p>The command in Snakemake pipeline:</p>
-<p>{% code lineNumbers=”true” %}</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># DNA mapping and sorting using bowtie2</span>
 <span class="n">bowtie2</span> <span class="o">-</span><span class="n">p</span> <span class="p">{</span><span class="n">threads</span><span class="p">}</span> <span class="o">-</span><span class="n">t</span> <span class="o">--</span><span class="n">phred33</span> <span class="o">-</span><span class="n">x</span> <span class="p">{</span><span class="n">params</span><span class="o">.</span><span class="n">index_prefix</span><span class="p">}</span> <span class="o">-</span><span class="n">U</span> <span class="p">{</span><span class="nb">input</span><span class="o">.</span><span class="n">DNA_fq</span><span class="p">}</span> <span class="mi">2</span><span class="o">&gt;</span> <span class="p">{</span><span class="n">output</span><span class="o">.</span><span class="n">human_bowtie2_stats</span><span class="p">}</span><span class="o">|</span> <span class="n">samtools</span> <span class="n">view</span> <span class="o">-</span><span class="n">bq</span> <span class="mi">20</span> <span class="o">-</span><span class="n">F</span> <span class="mi">4</span> <span class="o">-</span><span class="n">F</span> <span class="mi">256</span> <span class="o">-</span> <span class="o">|</span> <span class="n">samtools</span> <span class="n">sort</span> <span class="o">-@</span> <span class="mi">10</span> <span class="o">-</span><span class="n">m</span> <span class="mi">64</span><span class="n">G</span> <span class="o">-</span><span class="n">O</span> <span class="n">bam</span> <span class="o">-</span><span class="n">o</span> <span class="p">{</span><span class="n">output</span><span class="o">.</span><span class="n">DNA_human_bam</span><span class="p">}</span>
 
 <span class="c1"># RNA reads mapping and bam file sorting</span>
-<span class="n">STAR</span> <span class="o">--</span><span class="n">runThreadN</span> <span class="p">{</span><span class="n">threads</span><span class="p">}</span> <span class="o">--</span><span class="n">genomeDir</span> <span class="p">{</span><span class="nb">input</span><span class="o">.</span><span class="n">index_dir</span><span class="p">}</span> <span class="o">--</span><span class="n">readFilesIn</span> <span class="p">{</span><span class="nb">input</span><span class="o">.</span><span class="n">non_rRNA_fq</span><span class="p">}</span> <span class="o">--</span><span class="n">outSAMtype</span> <span class="n">BAM</span> <span class="n">SortedByCoordinate</span> <span class="o">--</span><span class="n">outFilterScoreMinOverLread</span> <span class="mi">0</span> <span class="o">--</span><span class="n">outFilterMatchNminOverLread</span> <span class="mf">0.5</span> <span class="o">--</span><span class="n">outFilterMatchNmin</span> <span class="mi">15</span> <span class="o">--</span><span class="n">outFileNamePrefix</span> <span class="p">{</span><span class="n">config</span><span class="p">[</span><span class="n">dir_names</span><span class="p">][</span><span class="n">mapped_RNA_dir</span><span class="p">]}{</span><span class="n">params</span><span class="p">}</span><span class="o">/</span><span class="p">{</span><span class="n">params</span><span class="p">}</span><span class="n">_human_</span>
-<span class="n">samtools</span> <span class="n">view</span> <span class="o">-</span><span class="n">bq</span> <span class="mi">255</span> <span class="o">-</span><span class="n">F</span> <span class="mi">4</span> <span class="o">-</span><span class="n">F</span> <span class="mi">256</span> <span class="p">{</span><span class="n">config</span><span class="p">[</span><span class="n">dir_names</span><span class="p">][</span><span class="n">mapped_RNA_dir</span><span class="p">]}{</span><span class="n">params</span><span class="p">}</span><span class="o">/</span><span class="p">{</span><span class="n">params</span><span class="p">}</span><span class="n">_human_Aligned</span><span class="o">.</span><span class="n">sortedByCoord</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">bam</span> <span class="o">|</span> <span class="n">samtools</span> <span class="n">sort</span> <span class="o">-@</span> <span class="mi">10</span> <span class="o">-</span><span class="n">m</span> <span class="mi">64</span><span class="n">G</span> <span class="o">-</span><span class="n">O</span> <span class="n">bam</span> <span class="o">-</span><span class="n">o</span> <span class="p">{</span><span class="n">output</span><span class="o">.</span><span class="n">STAR_human_bam</span><span class="p">}</span>
-<span class="n">samtools</span> <span class="n">index</span> <span class="p">{</span><span class="n">output</span><span class="o">.</span><span class="n">STAR_human_bam</span><span class="p">}</span>
+<span class="n">bwa</span> <span class="n">mem</span> <span class="o">-</span><span class="n">t</span> <span class="p">{</span><span class="n">threads</span><span class="p">}</span> <span class="o">-</span><span class="n">SP5M</span> <span class="p">{</span><span class="n">params</span><span class="o">.</span><span class="n">index_prefix</span><span class="p">}</span> <span class="p">{</span><span class="nb">input</span><span class="o">.</span><span class="n">non_rRNA_fq</span><span class="p">}</span> <span class="o">|</span> <span class="n">sambamba</span> <span class="n">view</span> <span class="o">-</span><span class="n">S</span> <span class="o">-</span><span class="n">t</span> <span class="p">{</span><span class="n">threads</span><span class="p">}</span> <span class="o">-</span><span class="n">h</span> <span class="o">-</span><span class="n">f</span> <span class="n">bam</span> <span class="o">-</span><span class="n">F</span> <span class="s2">&quot;mapping_quality &gt;= 1 and not (unmapped or secondary_alignment) and not ([XA] != null or [SA] != null)&quot;</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">stdin</span> <span class="o">|</span> <span class="n">sambamba</span> <span class="n">sort</span> <span class="o">-</span><span class="n">o</span> <span class="p">{</span><span class="n">output</span><span class="o">.</span><span class="n">BWA_human_bam</span><span class="p">}</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">stdin</span>
+
+<span class="n">samtools</span> <span class="n">index</span> <span class="p">{</span><span class="n">output</span><span class="o">.</span><span class="n">BWA_human_bam</span><span class="p">}</span>
 </pre></div>
 </div>
-<p>{% endcode %}</p>
 <p>The reads mapping, bam file sorting and indexing are using multi threads to accelerate. User only need to specify the total cpu that is available and all details will be taken care of by Snakemake. </p>
 </section>
 </section>
@@ -394,7 +390,7 @@
 <p>The bam output is compressed and can be easily imported and processed by widely used packages in <code class="docutils literal notranslate"><span class="pre">R</span></code> or <code class="docutils literal notranslate"><span class="pre">python</span></code></p>
 </section>
 <section id="summary-report">
-<h3><code class="docutils literal notranslate"><span class="pre">Summary</span> <span class="pre">report</span></code><a class="headerlink" href="#summary-report" title="Permalink to this heading">¶</a></h3>
+<h3>Summary report<a class="headerlink" href="#summary-report" title="Permalink to this heading">¶</a></h3>
 <p>MUSIC is designed as a single-cell single molecule method. It is highly useful for users to get an idea of the per cell reads, per molecular cluster reads quantity and distribution.  To this end, we derived the following summary files:</p>
 <table border="1" class="docutils">
 <thead>
