@@ -138,16 +138,15 @@ After all input files are ready, we are ready to initiate the pipelline with `do
 
 ```
 # download MUSIC-tool docker image:
-docker pull zhonglab/MUSIC:latest
+docker pull irenexzwen/music_docker:latest
 
 # run the pipeline
 docker run --rm \
-        -v /local_path/MUSIC_input_folder/:/input \
-        -v /local_path/MUSIC_input_folder/output/:/snakemake/outputs \
-        MUSIC:latest \
+        -v /local_path/MUSIC_input_folder/:/input \ 
+        -v /local_path/MUSIC_input_folder/output/:/snakemake/outputs \ 
+        music_docker:latest \
         --sample-json /input/data/samples.json \
         --num-jobs 20 \
-        --name mysample \
         --fa /input/ref/hg38_genome.fa \
         --gtf /input/ref/gencode.v36.annotation.gtf \
         --uid `id -u` \
