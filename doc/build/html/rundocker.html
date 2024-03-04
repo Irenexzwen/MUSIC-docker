@@ -46,11 +46,10 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Run MUSIC-tool pipeline in Docker</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#install-docker-on-your-system">Install Docker on your system</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#install-music-tool-image">Install MUSIC-tool image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-music-docker-image">Install MUSIC-docker image</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run-music-docker">Run MUSIC-docker</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#data-preparation">Data preparation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#initiate-the-music-tool-image">Initiate the MUSIC-tool image</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#running-time-of-the-pipeline">Running time of the pipeline</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#output-of-music-docker-pipeline">Output of MUSIC-docker pipeline</a></li>
@@ -87,7 +86,8 @@
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
 <p>MUSIC-docker is a tool designed to provide a one-stop solution for processing MUSIC data. It is a docker image that wraps a Snakemake pipeline. MUSIC-docker combines the power of Docker and Snakemake to provide a one-stop solution for processing MUSIC data. It allows you to easily deploy and run the MUSIC pipeline in a reproducible and efficient way, making it easier to manage and automate the data processing process.</p>
-<figure><img src="_images/docker_pipeline.png" alt=""><figcaption><p>MUSIC-docker overview</p></figcaption></figure><p><strong>Why we choose docker?</strong></p>
+<p><img alt="MUSIC-docker overview" src="_images/docker_pipeline.png" /></p>
+<p><strong>Why we choose docker?</strong></p>
 <p>Docker is a tool for packaging and deploying applications in lightweight containers. It allows you to package an application and its dependencies in a single container, making it easy to deploy and run on any platform. The philosophy behind Docker is to make it easier to create, deploy, and run applications by packaging them in containers. You can find more information about Docker and how to use it in the official Docker documentation at <a class="reference external" href="https://docs.docker.com/">https://docs.docker.com/</a>.</p>
 <p><strong>Why we choose Snakemake?</strong></p>
 <p>Snakemake is a workflow management system that allows you to define and run complex pipelines in a reproducible and efficient way. It is designed to be scalable, flexible, and easy to use, with a simple yet powerful syntax for defining workflows. The philosophy behind Snakemake is to provide a simple and intuitive way to define and run complex pipelines, making it easier to manage and automate complex workflow processes. You can find more information about Snakemake and how to use it in the official Snakemake documentation at <a class="reference external" href="https://snakemake.readthedocs.io/">https://snakemake.readthedocs.io/</a>.</p>
@@ -96,8 +96,8 @@
 <h2>Install Docker on your system<a class="headerlink" href="#install-docker-on-your-system" title="Permalink to this heading">¶</a></h2>
 <p>If you don’t have docker installed, please follow the instructions from docker docs: <a class="reference external" href="https://docs.docker.com/engine/install/">https://docs.docker.com/engine/install/</a></p>
 </section>
-<section id="install-music-tool-image">
-<h2>Install MUSIC-tool image<a class="headerlink" href="#install-music-tool-image" title="Permalink to this heading">¶</a></h2>
+<section id="install-music-docker-image">
+<h2>Install MUSIC-docker image<a class="headerlink" href="#install-music-docker-image" title="Permalink to this heading">¶</a></h2>
 <p>MUSIC-tool has now been uploaded to docker cloud, which means you can install the container  by <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">pull</span></code> command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">irenexzwen</span><span class="o">/</span><span class="n">music_docker</span>
 </pre></div>
@@ -107,7 +107,7 @@
 <h2>Run MUSIC-docker<a class="headerlink" href="#run-music-docker" title="Permalink to this heading">¶</a></h2>
 <section id="data-preparation">
 <h3>Data preparation<a class="headerlink" href="#data-preparation" title="Permalink to this heading">¶</a></h3>
-<p>To run MUSIC-tool locally, we first need to prepare the following input files in a structured directory. The docker image (created from MUSIC-tool container) will run in an independent virtual enviornment. The only way for the image to communicate with your local file is through the <code class="docutils literal notranslate"><span class="pre">mount</span></code> command. Softwares running inside the docker image will recognize input files with the path inside the docker enviornment but not the file path on your local machine. So it is cruial to keep your input files in a structured directory and pass down parameters using relative path.</p>
+<p>To run MUSIC-docker locally, we first need to prepare the following input files in a structured directory. The docker image (created from MUSIC-tool container) will run in an independent virtual enviornment. The only way for the image to communicate with your local file is through the <code class="docutils literal notranslate"><span class="pre">mount</span></code> command. Softwares running inside the docker image will recognize input files with the path inside the docker enviornment but not the file path on your local machine. So it is cruial to keep your input files in a structured directory and pass down parameters using relative path.</p>
 <p><strong>Required input files:</strong></p>
 <table border="1" class="docutils">
 <thead>
@@ -120,23 +120,23 @@
 <tbody>
 <tr>
 <td>.fastq.gz</td>
-<td>Input raw fastq files in gzipped format. Should have Read1 and Read2 files for 8 libs (if the initial library is spliited into 8 aliqotes and using unique index before sequencing).</td>
+<td>Input raw fastq files in gzipped format. Should have Read1 and Read2 files for 8 libs (Notice that the initial library is spliited into 8 aliqotes and using unique index before sequencing).</td>
 <td>Not fixed, as long as it is in gzipped format.</td>
 </tr>
 <tr>
 <td>.json</td>
-<td>A JSON file to specify the name of each lib and the file path of corresponded R1, R2 files. Notice the file path should only use relative path to the JSON file.</td>
+<td>A JSON file to specify the name of each lib and the file path of corresponded R1, R2 files. Notice the file path should only use relative path to the JSON file. We recommend to put the samples.json file in the same folder as the 8 pairs of fastq.gz files</td>
 <td>Required and fixed: samples.json</td>
 </tr>
 <tr>
 <td>.gtf</td>
 <td>gtf file of the reference genome of interest.</td>
-<td>Not fixed</td>
+<td>Not fixed. File name pass in as parameters when use docker run.</td>
 </tr>
 <tr>
 <td>.fa</td>
 <td>fasta file of the reference genome of interest.</td>
-<td>Not fixed</td>
+<td>Not fixed. File name pass in as parameters when use docker run.</td>
 </tr>
 </tbody>
 </table><p>On your local machine prepare a input folder structured as follows:</p>
@@ -166,9 +166,9 @@
     └── hg38_genome.fa
 </pre></div>
 </div>
-<p>{% hint style=”warning” %}
-Notice that the output folder is necessary (even though it is empty right now), and it is the folder where your final output files will be located.
-{% endhint %}</p>
+<blockquote>
+<div><p>Notice that the output folder is necessary (even though it is empty right now), and it is the folder where your final output files will be located.</p>
+</div></blockquote>
 <p>The samples.json file in our example will look like</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">samples</span><span class="o">.</span><span class="n">json</span>
 <span class="p">{</span>
@@ -216,21 +216,42 @@ Notice that the output folder is necessary (even though it is empty right now), 
 </pre></div>
 </div>
 <p>These are all required input files for MUSIC-tool to run!</p>
+<blockquote>
+<div><p><strong>Alternative</strong>: The pipeline is designed to automatically build bowtie2 and bwa references by default. However, if you prefer not to wait and wish to provide pre-built indices, follow these steps: 1. Create a folder named ‘/0_index/’ under the ‘/output/’ directory. 2. Place your pre-built index files in the created ‘/0_index/’ folder, following the tree structure outlined below. Ensure that your index match the names in the specified tree structure to enable Snakemake to recognize these files. Two essential files, namely “bowtie2_index_done.txt” and “_bwa_index_done.txt,” must be included. These files serve as checkmarks for Snakemake, indicating the completion of the index-building step before proceeding to the next stage. The content of these two .txt files can be anything you prefer.</p>
+</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── output
+│   ├── 0_index
+│   │   ├── bowtie2
+│   │   │   ├── bowtie2.1.bt2
+│   │   │   ├── bowtie2.2.bt2
+│   │   │   ├── bowtie2.3.bt2
+│   │   │   ├── bowtie2.4.bt2
+│   │   │   ├── bowtie2_index_done.txt
+│   │   │   ├── bowtie2.rev.1.bt2
+│   │   │   └── bowtie2.rev.2.bt2
+│   │   └── BWA
+│   │       ├── bwa_index.amb
+│   │       ├── bwa_index.ann
+│   │       ├── bwa_index.bwt
+│   │       ├── _bwa_index_done.txt
+│   │       ├── bwa_index.pac
+│   │       └── bwa_index.sa
+</pre></div>
+</div>
 </section>
 <section id="initiate-the-music-tool-image">
 <h3>Initiate the MUSIC-tool image<a class="headerlink" href="#initiate-the-music-tool-image" title="Permalink to this heading">¶</a></h3>
 <p>After all input files are ready, we are ready to initiate the pipelline with <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span></code> command.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span># download MUSIC-tool docker image:
-docker pull zhonglab/MUSIC:latest
+docker pull irenexzwen/music_docker
 
 # run the pipeline
 docker run --rm \
-        -v /local_path/MUSIC_input_folder/:/input \
-        -v /local_path/MUSIC_input_folder/output/:/snakemake/outputs \
-        MUSIC:latest \
+        -v /local_path/MUSIC_input_folder/:/input \ 
+        -v /local_path/MUSIC_input_folder/output/:/snakemake/outputs \ 
+        music_docker:latest \
         --sample-json /input/data/samples.json \
         --num-jobs 20 \
-        --name mysample \
         --fa /input/ref/hg38_genome.fa \
         --gtf /input/ref/gencode.v36.annotation.gtf \
         --uid `id -u` \
@@ -241,25 +262,19 @@ docker run --rm \
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">--rm</span></code> : By default, when a container exits, it is not removed and can still be inspected and restarted using the <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">start</span></code> command. However, if the <code class="docutils literal notranslate"><span class="pre">--rm</span></code> flag is specified, the container will be automatically removed once it exits. This can be useful for cleaning up after a one-time task, as it ensures that the system does not accumulate stopped containers that are no longer needed.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">-v</span></code>:  The <code class="docutils literal notranslate"><span class="pre">-v</span></code> flag is used with the <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span></code> command to bind-mount a volume from the host system into a container. This allows you to share data between the host system and the container, or to persist data that is generated within the container beyond the lifetime of the container. the host path and the container path separated by a colon (<code class="docutils literal notranslate"><span class="pre">:</span></code>). In our command, we mount twice, the first one is <code class="docutils literal notranslate"><span class="pre">-v</span> <span class="pre">/local_path/MUSIC_input_folder/:/input</span></code> which mount the local input folder to folder <code class="docutils literal notranslate"><span class="pre">/input</span></code> in docker image. As you could see, later when we specify other parameters such as <code class="docutils literal notranslate"><span class="pre">-fa,</span> <span class="pre">-gtf</span></code> , we will use the new path that is in docker image as “/input/ref/**.fa”.  The second one is <code class="docutils literal notranslate"><span class="pre">-v</span> <span class="pre">/local_path/MUSIC_input_folder/out/:/snakemake/outputs</span></code> which is used to map docker produced output back to our local folder.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MUSIC:latest</span></code>: Before adding other customized parameters, we need to specify the image name, which is usually <code class="docutils literal notranslate"><span class="pre">name:tag</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MUSIC:latest</span></code>: Before adding other customized parameters, we need to specify the image name, which is usually <code class="docutils literal notranslate"><span class="pre">name:tag</span></code>. The default tag is <code class="docutils literal notranslate"><span class="pre">latest</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--sample-json</span></code>: Location of the samples.json file inside the docker, not local file path. No need to change the default if you structured your input folder as we suggested.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--num-jobs</span></code>: Threads for running the job. Snakemake will automatically distribute cpus to all jobs in a very efficient manner.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--fa</span></code>: Location of the reference genome fasta file inside the docker, not local file path. No need to change the default if you structured your input folder as we suggested.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--gtf</span></code>: Similar to <code class="docutils literal notranslate"><span class="pre">--fa</span></code>, but for location of the reference genome gtf file.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">--uid</span> <span class="pre">`id</span> <span class="pre">-u`</span></code>:  No need to change this command. Here <code class="docutils literal notranslate"><span class="pre">`id</span> <span class="pre">-u`</span></code>will obtain your user id on your local machine. This parameter is extremely crucial and it allows you (local user) to have permissions and ownership to all output files that produced by docker and Snakemake. Docker by default will create all files under <code class="docutils literal notranslate"><span class="pre">USER</span> <span class="pre">root</span></code> which is extremely inconvenient. However, the change of ownership from root to local user will only be done after all output has finished. If your program is killed or stopped before finish the pipeline, the output file can still be owner by root.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--uid</span> <span class="pre">`id</span> <span class="pre">-u`</span></code>:  No need to change this command. Here <code class="docutils literal notranslate"><span class="pre">`id</span> <span class="pre">-u`</span></code>will obtain your bowtie2 id on your local machine. This parameter is extremely crucial and it allows you (local bowtie2) to have permissions and ownership to all output files that produced by docker and Snakemake. Docker by default will create all files under <code class="docutils literal notranslate"><span class="pre">bowtie2</span> <span class="pre">root</span></code> which is extremely inconvenient. However, the change of ownership from root to local bowtie2 will only be done after all output has finished. If your program is killed or stopped before finish the pipeline, the output file can still be owner by root.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--gid</span> <span class="pre">`id</span> <span class="pre">-g`</span></code>: No need to change this command. Here <code class="docutils literal notranslate"><span class="pre">`id</span> <span class="pre">-g`</span></code>will obtain your group id on your local machine.</p></li>
 </ul>
-</section>
-<section id="running-time-of-the-pipeline">
-<h3>Running time of the pipeline<a class="headerlink" href="#running-time-of-the-pipeline" title="Permalink to this heading">¶</a></h3>
-<p>{% hint style=”danger” %}
-add benchmark with test data.
-{% endhint %}</p>
 </section>
 </section>
 <section id="output-of-music-docker-pipeline">
 <h2>Output of MUSIC-docker pipeline<a class="headerlink" href="#output-of-music-docker-pipeline" title="Permalink to this heading">¶</a></h2>
-<p>The output folder includes all intermediate files for users to check and potential making use of. Briefly we have 6 major folder corresponds to each step.</p>
+<p>The output folder includes all intermediate files for bowtie2s to check and potential making use of. Briefly we have 6 major folder corresponds to each step.</p>
 <table border="1" class="docutils">
 <thead>
 <tr>
@@ -272,7 +287,7 @@ add benchmark with test data.
 <tr>
 <td>/0_index</td>
 <td>contains bowtie2 and STAR index.</td>
-<td><ul><li>/0_index/bowtie2</li><li>/0_index/STAR</li></ul></td>
+<td><ul><li>/0_index/bowtie2</li><li>/0_index/BWA</li></ul></td>
 </tr>
 <tr>
 <td>/1_decode</td>
@@ -286,13 +301,13 @@ add benchmark with test data.
 </tr>
 <tr>
 <td>/3_RNAmapping</td>
-<td>STAR RNA mapping results output folder</td>
-<td><ul><li>STAR output folder like</li><li>STAR_mapq255_lib*.bam (only mapq&gt;=255 reads)</li></ul></td>
+<td>BWA RNA mapping results output folder</td>
+<td>\lib<em>\ <ul><li>BWA_uniq_map_lib</em>.bam</li><li>BWA_uniq_map_lib*.bai</li></ul></td>
 </tr>
 <tr>
 <td>/4_dedup</td>
 <td>Dedupped and sorted DNA and RNA uniquely mapped bam file.</td>
-<td><ul><li>bowtie2_mapq20_lib*.sorted.dedup.bam</li><li>RNA_STAR_mapq255_lib*.sorted.dedup.bam</li></ul></td>
+<td><ul><li>bowtie2_mapq20_lib*.sorted.dedup.bam</li><li>RNA_BWA_uniq_map_lib*.sorted.dedup.bam</li></ul></td>
 </tr>
 <tr>
 <td>/5_merge</td>
@@ -304,40 +319,27 @@ add benchmark with test data.
 <td>Cell and cluster size, DNA/RNA reads abundance statstitics.</td>
 <td><ul><li>merge_DNA(RNA).sort.cell_clusters.csv</li><li>merge_DNA(RNA).sort.cell_reads.csv</li><li>merge_DNA(RNA).sort.clusters_size.csv</li><li>merge.sort.cluster_rna_dna.csv</li></ul></td>
 </tr>
-<tr>
-<td>Library_stats.docx</td>
-<td>Summary statsitcis of each step.</td>
-<td><ul><li>NA</li></ul></td>
-</tr>
 </tbody>
 </table><p>The full tree structure of the final output folder will look like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&gt; tree /local_path/MUSIC_input_folder/output/
 
+.
 ├── 0_index
 │   ├── bowtie2
-│   │   ├── user.1.bt2
-│   │   ├── user.2.bt2
-│   │   ├── user.3.bt2
-│   │   ├── user.4.bt2
-│   │   ├── user_index_done.txt
-│   │   ├── user.rev.1.bt2
-│   │   └── user.rev.2.bt2
-│   └── STAR
-│       ├── chrLength.txt
-│       ├── chrNameLength.txt
-│       ├── chrName.txt
-│       ├── chrStart.txt
-│       ├── exonGeTrInfo.tab
-│       ├── exonInfo.tab
-│       ├── geneInfo.tab
-│       ├── Genome
-│       ├── genomeParameters.txt
-│       ├── SA
-│       ├── SAindex
-│       ├── sjdbInfo.txt
-│       ├── sjdbList.fromGTF.out.tab
-│       ├── sjdbList.out.tab
-│       └── transcriptInfo.tab
+│   │   ├── bowtie2.1.bt2
+│   │   ├── bowtie2.2.bt2
+│   │   ├── bowtie2.3.bt2
+│   │   ├── bowtie2.4.bt2
+│   │   ├── bowtie2_index_done.txt
+│   │   ├── bowtie2.rev.1.bt2
+│   │   └── bowtie2.rev.2.bt2
+│   └── BWA
+│       ├── bwa_index.amb
+│       ├── bwa_index.ann
+│       ├── bwa_index.bwt
+│       ├── _bwa_index_done.txt
+│       ├── bwa_index.pac
+│       └── bwa_index.sa
 ├── 1_decode
 │   ├── lib1_cutadap_trimed_DNAend_decode.fq
 │   ├── lib1_cutadap_trimed_RNAend_decode.fq
@@ -380,183 +382,86 @@ add benchmark with test data.
 │   ├── lib8_RNAend_decode.fq
 │   └── lib8_stats.log
 ├── 2_DNAmapping
-│   ├── human_bowtie2_mapq20_lib1.sorted.bam
-│   ├── human_bowtie2_mapq20_lib1.stats.txt
-│   ├── human_bowtie2_mapq20_lib2.sorted.bam
-│   ├── human_bowtie2_mapq20_lib2.stats.txt
-│   ├── human_bowtie2_mapq20_lib3.sorted.bam
-│   ├── human_bowtie2_mapq20_lib3.stats.txt
-│   ├── human_bowtie2_mapq20_lib4.sorted.bam
-│   ├── human_bowtie2_mapq20_lib4.stats.txt
-│   ├── human_bowtie2_mapq20_lib5.sorted.bam
-│   ├── human_bowtie2_mapq20_lib5.stats.txt
-│   ├── human_bowtie2_mapq20_lib6.sorted.bam
-│   ├── human_bowtie2_mapq20_lib6.stats.txt
-│   ├── human_bowtie2_mapq20_lib7.sorted.bam
-│   ├── human_bowtie2_mapq20_lib7.stats.txt
-│   ├── human_bowtie2_mapq20_lib8.sorted.bam
-│   └── human_bowtie2_mapq20_lib8.stats.txt
+│   ├── bowtie2_mapq20_lib1.sorted.bam
+│   ├── bowtie2_mapq20_lib1.stats.txt
+│   ├── bowtie2_mapq20_lib2.sorted.bam
+│   ├── bowtie2_mapq20_lib2.stats.txt
+│   ├── bowtie2_mapq20_lib3.sorted.bam
+│   ├── bowtie2_mapq20_lib3.stats.txt
+│   ├── bowtie2_mapq20_lib4.sorted.bam
+│   ├── bowtie2_mapq20_lib4.stats.txt
+│   ├── bowtie2_mapq20_lib5.sorted.bam
+│   ├── bowtie2_mapq20_lib5.stats.txt
+│   ├── bowtie2_mapq20_lib6.sorted.bam
+│   ├── bowtie2_mapq20_lib6.stats.txt
+│   ├── bowtie2_mapq20_lib7.sorted.bam
+│   ├── bowtie2_mapq20_lib7.stats.txt
+│   ├── bowtie2_mapq20_lib8.sorted.bam
+│   └── bowtie2_mapq20_lib8.stats.txt
 ├── 3_RNAmapping
 │   ├── lib1
-│   │   ├── human_STAR_mapq255_lib1.bam
-│   │   ├── human_STAR_mapq255_lib1.bam.bai
-│   │   ├── lib1_human_Aligned.sortedByCoord.out.bam
-│   │   ├── lib1_human_Log.final.out
-│   │   ├── lib1_human_Log.out
-│   │   ├── lib1_human_Log.progress.out
-│   │   ├── lib1_human_SJ.out.tab
-│   │   └── lib1_human__STARtmp
-│   │       └── BAMsort
-│   │           ├── 0
-│   │           ├── 1
-│   │           ├── 2
-│   │           ├── 3
-│   │           └── 4
+│   │   ├── BWA_uniq_map_lib1.bam
+│   │   └── BWA_uniq_map_lib1.bam.bai
 │   ├── lib2
-│   │   ├── human_STAR_mapq255_lib2.bam
-│   │   ├── human_STAR_mapq255_lib2.bam.bai
-│   │   ├── lib2_human_Aligned.sortedByCoord.out.bam
-│   │   ├── lib2_human_Log.final.out
-│   │   ├── lib2_human_Log.out
-│   │   ├── lib2_human_Log.progress.out
-│   │   ├── lib2_human_SJ.out.tab
-│   │   └── lib2_human__STARtmp
-│   │       └── BAMsort
-│   │           ├── 0
-│   │           ├── 1
-│   │           ├── 2
-│   │           ├── 3
-│   │           └── 4
+│   │   ├── BWA_uniq_map_lib2.bam
+│   │   └── BWA_uniq_map_lib2.bam.bai
 │   ├── lib3
-│   │   ├── human_STAR_mapq255_lib3.bam
-│   │   ├── human_STAR_mapq255_lib3.bam.bai
-│   │   ├── lib3_human_Aligned.sortedByCoord.out.bam
-│   │   ├── lib3_human_Log.final.out
-│   │   ├── lib3_human_Log.out
-│   │   ├── lib3_human_Log.progress.out
-│   │   ├── lib3_human_SJ.out.tab
-│   │   └── lib3_human__STARtmp
-│   │       └── BAMsort
-│   │           ├── 0
-│   │           ├── 1
-│   │           ├── 2
-│   │           ├── 3
-│   │           └── 4
+│   │   ├── BWA_uniq_map_lib3.bam
+│   │   └── BWA_uniq_map_lib3.bam.bai
 │   ├── lib4
-│   │   ├── human_STAR_mapq255_lib4.bam
-│   │   ├── human_STAR_mapq255_lib4.bam.bai
-│   │   ├── lib4_human_Aligned.sortedByCoord.out.bam
-│   │   ├── lib4_human_Log.final.out
-│   │   ├── lib4_human_Log.out
-│   │   ├── lib4_human_Log.progress.out
-│   │   ├── lib4_human_SJ.out.tab
-│   │   └── lib4_human__STARtmp
-│   │       └── BAMsort
-│   │           ├── 0
-│   │           ├── 1
-│   │           ├── 2
-│   │           ├── 3
-│   │           └── 4
+│   │   ├── BWA_uniq_map_lib4.bam
+│   │   └── BWA_uniq_map_lib4.bam.bai
 │   ├── lib5
-│   │   ├── human_STAR_mapq255_lib5.bam
-│   │   ├── human_STAR_mapq255_lib5.bam.bai
-│   │   ├── lib5_human_Aligned.sortedByCoord.out.bam
-│   │   ├── lib5_human_Log.final.out
-│   │   ├── lib5_human_Log.out
-│   │   ├── lib5_human_Log.progress.out
-│   │   ├── lib5_human_SJ.out.tab
-│   │   └── lib5_human__STARtmp
-│   │       └── BAMsort
-│   │           ├── 0
-│   │           ├── 1
-│   │           ├── 2
-│   │           ├── 3
-│   │           └── 4
+│   │   ├── BWA_uniq_map_lib5.bam
+│   │   └── BWA_uniq_map_lib5.bam.bai
 │   ├── lib6
-│   │   ├── human_STAR_mapq255_lib6.bam
-│   │   ├── human_STAR_mapq255_lib6.bam.bai
-│   │   ├── lib6_human_Aligned.sortedByCoord.out.bam
-│   │   ├── lib6_human_Log.final.out
-│   │   ├── lib6_human_Log.out
-│   │   ├── lib6_human_Log.progress.out
-│   │   ├── lib6_human_SJ.out.tab
-│   │   └── lib6_human__STARtmp
-│   │       └── BAMsort
-│   │           ├── 0
-│   │           ├── 1
-│   │           ├── 2
-│   │           ├── 3
-│   │           └── 4
+│   │   ├── BWA_uniq_map_lib6.bam
+│   │   └── BWA_uniq_map_lib6.bam.bai
 │   ├── lib7
-│   │   ├── human_STAR_mapq255_lib7.bam
-│   │   ├── human_STAR_mapq255_lib7.bam.bai
-│   │   ├── lib7_human_Aligned.sortedByCoord.out.bam
-│   │   ├── lib7_human_Log.final.out
-│   │   ├── lib7_human_Log.out
-│   │   ├── lib7_human_Log.progress.out
-│   │   ├── lib7_human_SJ.out.tab
-│   │   └── lib7_human__STARtmp
-│   │       └── BAMsort
-│   │           ├── 0
-│   │           ├── 1
-│   │           ├── 2
-│   │           ├── 3
-│   │           └── 4
+│   │   ├── BWA_uniq_map_lib7.bam
+│   │   └── BWA_uniq_map_lib7.bam.bai
 │   └── lib8
-│       ├── human_STAR_mapq255_lib8.bam
-│       ├── human_STAR_mapq255_lib8.bam.bai
-│       ├── lib8_human_Aligned.sortedByCoord.out.bam
-│       ├── lib8_human_Log.final.out
-│       ├── lib8_human_Log.out
-│       ├── lib8_human_Log.progress.out
-│       ├── lib8_human_SJ.out.tab
-│       └── lib8_human__STARtmp
-│           └── BAMsort
-│               ├── 0
-│               ├── 1
-│               ├── 2
-│               ├── 3
-│               └── 4
+│       ├── BWA_uniq_map_lib8.bam
+│       └── BWA_uniq_map_lib8.bam.bai
 ├── 4_dedup
 │   ├── lib1
-│   │   ├── human_bowtie2_mapq20_lib1.sorted.dedup.bam
-│   │   └── human_RNA_STAR_mapq255_lib1.sorted.dedup.bam
-│   ├── lib2                                                                                                                                                    [0/432]
-│   │   ├── human_bowtie2_mapq20_lib2.sorted.dedup.bam
-│   │   └── human_RNA_STAR_mapq255_lib2.sorted.dedup.bam
+│   │   ├── bowtie2_mapq20_lib1.sorted.dedup.bam
+│   │   └── RNA_BWA_uniq_map_lib1.sorted.dedup.bam
+│   ├── lib2
+│   │   ├── bowtie2_mapq20_lib2.sorted.dedup.bam
+│   │   └── RNA_BWA_uniq_map_lib2.sorted.dedup.bam
 │   ├── lib3
-│   │   ├── human_bowtie2_mapq20_lib3.sorted.dedup.bam
-│   │   └── human_RNA_STAR_mapq255_lib3.sorted.dedup.bam
+│   │   ├── bowtie2_mapq20_lib3.sorted.dedup.bam
+│   │   └── RNA_BWA_uniq_map_lib3.sorted.dedup.bam
 │   ├── lib4
-│   │   ├── human_bowtie2_mapq20_lib4.sorted.dedup.bam
-│   │   └── human_RNA_STAR_mapq255_lib4.sorted.dedup.bam
+│   │   ├── bowtie2_mapq20_lib4.sorted.dedup.bam
+│   │   └── RNA_BWA_uniq_map_lib4.sorted.dedup.bam
 │   ├── lib5
-│   │   ├── human_bowtie2_mapq20_lib5.sorted.dedup.bam
-│   │   └── human_RNA_STAR_mapq255_lib5.sorted.dedup.bam
+│   │   ├── bowtie2_mapq20_lib5.sorted.dedup.bam
+│   │   └── RNA_BWA_uniq_map_lib5.sorted.dedup.bam
 │   ├── lib6
-│   │   ├── human_bowtie2_mapq20_lib6.sorted.dedup.bam
-│   │   └── human_RNA_STAR_mapq255_lib6.sorted.dedup.bam
+│   │   ├── bowtie2_mapq20_lib6.sorted.dedup.bam
+│   │   └── RNA_BWA_uniq_map_lib6.sorted.dedup.bam
 │   ├── lib7
-│   │   ├── human_bowtie2_mapq20_lib7.sorted.dedup.bam
-│   │   └── human_RNA_STAR_mapq255_lib7.sorted.dedup.bam
+│   │   ├── bowtie2_mapq20_lib7.sorted.dedup.bam
+│   │   └── RNA_BWA_uniq_map_lib7.sorted.dedup.bam
 │   └── lib8
-│       ├── human_bowtie2_mapq20_lib8.sorted.dedup.bam
-│       └── human_RNA_STAR_mapq255_lib8.sorted.dedup.bam
+│       ├── bowtie2_mapq20_lib8.sorted.dedup.bam
+│       └── RNA_BWA_uniq_map_lib8.sorted.dedup.bam
 ├── 5_merge
-│   ├── merge_DNA_human.sort.bam
-│   └── merge_RNA_human.sort.bam
-├── 6_stats
-│   ├── merge_DNA_human.sort.cell_clusters.csv
-│   ├── merge_DNA_human.sort.cell_reads.csv
-│   ├── merge_DNA_human.sort.clusters_size.csv
-│   ├── merge_human.sort.cluster_rna_dna.csv
-│   ├── merge_RNA_human.sort.cell_clusters.csv
-│   ├── merge_RNA_human.sort.cell_reads.csv
-│   └── merge_RNA_human.sort.clusters_size.csv
-└── Library_stats.docx
+│   ├── merge_DNA.sort.bam
+│   └── merge_RNA.sort.bam
+└── 6_stats
+    ├── cell_stats_done.txt
+    ├── merge_DNA.sort.cell_clusters.csv
+    ├── merge_DNA.sort.cell_reads.csv
+    ├── merge_DNA.sort.clusters_size.csv
+    ├── merge_RNA.sort.cell_clusters.csv
+    ├── merge_RNA.sort.cell_reads.csv
+    ├── merge_RNA.sort.clusters_size.csv
+    └── merge.sort.cluster_rna_dna.csv
 </pre></div>
 </div>
-<p>\</p>
 </section>
 </section>
 

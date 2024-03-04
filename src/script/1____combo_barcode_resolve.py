@@ -58,13 +58,13 @@ logging.info('---- start ----')
 # ---- dictionary of reference cell barcode ----
 BCD_DIR = "/snakemake/barcode"
 
-BC3 = pd.read_csv(BCD_DIR+"/dna_barcode_shuf_3.txt",lineterminator="\n", header=None)[0].tolist()
+BC3 = pd.read_csv(BCD_DIR+"/dna_barcode_shuf_3.txt",header=None)[0].tolist()
 BC3_dict = dict(zip(BC3, ["BC3_" + str(x) for x in np.arange(1, len(BC3))]))
 
-BC2 = pd.read_csv(BCD_DIR+"/dna_barcode_shuf_2.txt",lineterminator="\n", header=None)[0].tolist()
+BC2 = pd.read_csv(BCD_DIR+"/dna_barcode_shuf_2.txt",header=None)[0].tolist()
 BC2_dict = dict(zip(BC2, ["BC2_" + str(x) for x in np.arange(1, len(BC2))]))
 
-BC1 = pd.read_csv(BCD_DIR+"/dna_barcode_shuf_1.txt",lineterminator="\n", header=None)[0].tolist()
+BC1 = pd.read_csv(BCD_DIR+"/dna_barcode_shuf_1.txt",header=None)[0].tolist()
 BC1_dict = dict(zip(BC1, ["BC1_" + str(x) for x in np.arange(1, len(BC1))]))
 
 

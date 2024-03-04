@@ -20,7 +20,7 @@ CONFIG = {
     "fasta":args.fa,
     "gtf":args.gtf,
     "dir_names":{
-      "DNA_index_dir": "outputs/0_index/bowtie2/user",
+      "DNA_index_dir": "outputs/0_index/bowtie2/bowtie2",
       "RNA_index_dir": "outputs/0_index/BWA/",
       "decode_dir": "outputs/1_decode/",
       "mapped_DNA_dir": "outputs/2_DNAmapping/",
