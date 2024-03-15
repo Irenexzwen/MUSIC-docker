@@ -12,15 +12,7 @@ The MUSIC method is a technique for capturing multiway nucleotide interactions w
 
 ## Library configuration
 
-The experimental protocols and sequencing library designs is described in the previous chapter.  The sequence configuration is illustrated in Figure2. We adopted a pair-end sequencing strategy. Read1 is 28bp which records 16bp 10x barcode and 12bp UMI sequences. Read2 is 150bp which records three cell barcodes, DNA/RNA Linker sequence and DNA/RNA insert sequence. Based on the design, RNA and DNA libraries can be pooled to be sequenced in the same run, and then be distinguished by the Linker sequence. We use the 19bp unique sequence (the leftmost 19bp before NNNNN) with up to 2 mismatches to select DNA molecules. The RNA linker has a 15bp unique sequence interspersed with 5bp random umi, where we use all 20bp to select RNA molecules by allowing at most 2 mismatches. Given the length of either human genome (3 billion) or mouse genome (2.5 billion), the chance of seeing a random 19mer with the same sequence as a DNA linker is around 1%.
-
-![Figure 2: MUSIC experimental workflow.](_images/MUSIC_library_construction.png)
-
-### Terminologies:
-
-* **CB**: Cell barcode. It is a combination of BC3, BC2 and BC1.
-* **CBMB**: Complex barcode = 10X GEM Barcode + I7
-* **I7:** I7 index. Each lib is one of the eight aliquots.
+The experimental protocols and sequencing library designs is described in the previous chapter.  The sequence configuration is illustrated in Figure2. We adopted a pair-end sequencing strategy. Read1 is 28bp which records 16bp 10x barcode and 12bp UMI sequences. Read2 is 150bp which records three cell barcodes, DNA/RNA Linker sequence and DNA/RNA insert sequence. Based on the design, RNA and DNA libraries can be pooled to be sequenced in the same run, and then be distinguished by the Linker sequence. We use the 19bp unique sequence (the leftmost 19bp before NNNNN) with up to 2 mismatches to select DNA molecules. The RNA linker has a 15bp unique sequence interspersed with 5bp random umi, where we use all 20bp to select RNA molecules by allowing at most 2 mismatches. 
 
 
 
