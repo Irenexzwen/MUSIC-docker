@@ -6,7 +6,7 @@ A comprehensive overview of data analyzing pipeline can be found at: http://sysb
 
 MUSIC-docker is a tool designed to provide a one-stop solution for processing MUSIC data. It is a docker image that wraps a Snakemake pipeline. MUSIC-docker combines the power of Docker and Snakemake to provide a one-stop solution for processing MUSIC data. It allows you to easily deploy and run the MUSIC pipeline in a reproducible and efficient way, making it easier to manage and automate the data processing process.
 
-![MUSIC-docker overview](doc/source/_images/docker_pipeline.png)
+![MUSIC-docker overview](/doc/source/_images/docker_pipeline.png)
 
 **Why we choose docker?**
 
@@ -350,7 +350,6 @@ The full tree structure of the final output folder will look like:
     └── merge.sort.cluster_rna_dna.csv
 ```
 
-Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 
 This work is licensed under a
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
