@@ -11,7 +11,7 @@ Demultiplexing is the step to extract the following important informations from 
 | Cell Barcode # 3                 | 14-17 bp    | 96                 | Read2 bp 1       |
 | Cell Barcode # 2                 | 14bp        | 96                 | Read2 bp 21 - 24 |
 | Cell Barcode # 1                 | 14bp        | 96                 | Read2 bp 52 - 55 |
-| RNA/DNA adaptors                 | 20bp / 24bp | NA                 | Read2 bp 63 - 66 |
+| RNA/DNA Linkers          | 20bp / 24bp | NA                 | Read2 bp 63 - 66 |
 | Molecular Barcode (10x barcode)  | 16bp        | 3.5 million        | Read1 bp 1       |
 | UMI                              | 12bp        | NA                 | Read1 bp 13      |
 
